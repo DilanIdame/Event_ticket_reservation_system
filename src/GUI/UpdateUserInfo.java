@@ -9,16 +9,21 @@ import CODE.DbConnect;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.table.DefaultTableModel;
 
 public class UpdateUserInfo extends javax.swing.JFrame {
 
     Connection conn = null;
     PreparedStatement pst = null;
+    ResultSet rs = null;
+    public int userID;
     
-    public UpdateUserInfo() {
+    public UpdateUserInfo() throws SQLException {
         initComponents();
-        conn= (Connection) DbConnect.connect();
+        conn= DbConnect.connect();
+        showDetails();
     }
 
     /**
@@ -247,13 +252,19 @@ public class UpdateUserInfo extends javax.swing.JFrame {
                 String password = "";
                 this.conn = DriverManager.getConnection(jdbcUrl, username, password);
                 }
-                String sql = "UPDATE user SET user_name = newn, user_password = newp, mobile_number = nContact, email= newEmail WHERE user_name=oldn , user_password=oldp";
-                pst = conn.prepareStatement(sql);
-                pst.execute();
+                String sql = "UPDATE user SET user_name = ?, user_password = ?, mobile_number = ?, email= ? WHERE user_name=? , user_password=?";
+                PreparedStatement add = conn.prepareStatement(sql);
+                add.setString(1,newn);
+                add.setString(2,newp);
+                add.setString(3,nContact);
+                add.setString(4,nEmail);
+                add.setString(5,oldn);
+                add.setString(6,oldp);
+                add.executeUpdate();
                 JOptionPane.showMessageDialog(null,"Update Sucessfully!");
                 
-            }catch(Exception e){
-                JOptionPane.showMessageDialog(null,e);
+            }catch(SQLException e){
+                JOptionPane.showMessageDialog(null,"Error occurs at Update info button: "+e);
             }
         }
         
@@ -278,10 +289,14 @@ public class UpdateUserInfo extends javax.swing.JFrame {
     }//GEN-LAST:event_newContactActionPerformed
 
     private void backUser_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backUser_bttnActionPerformed
-        // TODO add your handling code here:
-        UserProfile userNew = new UserProfile();
-        userNew.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            UserProfile userNew = new UserProfile();
+            userNew.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null,ex);
+        }
     }//GEN-LAST:event_backUser_bttnActionPerformed
 
     private void clearbttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearbttnActionPerformed
@@ -336,8 +351,13 @@ public class UpdateUserInfo extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new UpdateUserInfo().setVisible(true);
+                try {
+                    new UpdateUserInfo().setVisible(true);
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(null,ex);
+                }
             }
         });
     }
@@ -365,4 +385,26 @@ public class UpdateUserInfo extends javax.swing.JFrame {
     private javax.swing.JTextField oldname;
     private javax.swing.JButton updateinfobtn;
     // End of variables declaration//GEN-END:variables
+private void showDetails()throws SQLException {
+        try {
+            String sqlNew = "SELECT * where user_ID=? ";
+            pst = conn.prepareStatement(sqlNew);
+            pst.setInt(1, userID);
+            rs = pst.executeQuery();
+            while(rs.next()){
+                String seat_type = rs.getString("seat_category");
+                String number_of = String.valueOf(rs.getInt("NoOf_seats"));
+                String eventName = rs.getString("event_Name");
+                
+                String tbDataNew[]= {seat_type,number_of ,eventName};
+                DefaultTableModel tblModel = (DefaultTableModel)details_table.getModel();
+               
+                tblModel.addRow(tbDataNew);
+            }
+             }
+        catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,e);
+            }
+    }
 }
+

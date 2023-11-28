@@ -1,42 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package GUI;
 
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
-import CODE.DbConnect;
-import java.sql.*;
-/**
- *
- * @author User
- */
+
+
 public class Login extends javax.swing.JFrame {
 
-    Connection conn = null;
-    PreparedStatement pst;
+
+    
     public Login() {
         initComponents();
-        conn= (Connection) DbConnect.connect();
+//        conn= (Connection) DbConnect.connect();
     }
-    public String username;
-    public String key;
+    public String userName = "User";
+    public String ukey = "12345";
+    public String ucontact= "0702827464";
+    public String uemail = "user@gmail.com";
+    public int userID = 1;
     
-     private static boolean isValidUser(Connection connection, String username, String password) throws SQLException {
-        // SQL query to check if the user exists
-      
-      String sql = "SELECT * FROM user WHERE username = ? AND password = ?";
+    public String adminName = "admin";
+    public String adminkey = "admin1234";
+    public String admincontact = "071202020678";
+    
 
-      try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-
-           try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                // If a row is returned, the user exists
-                return resultSet.next();
-            }
-      }
-     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -61,10 +48,10 @@ public class Login extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         admin_name = new javax.swing.JTextField();
-        admin_password = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
         userReg_bttn = new javax.swing.JButton();
         admin_reset_bttn = new javax.swing.JButton();
+        admin_password = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -203,7 +190,6 @@ public class Login extends javax.swing.JFrame {
             }
         });
         jPanel3.add(admin_name, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 280, 190, -1));
-        jPanel3.add(admin_password, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 320, 190, -1));
         jPanel3.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 490, 10));
 
         userReg_bttn.setBackground(new java.awt.Color(204, 204, 204));
@@ -229,6 +215,7 @@ public class Login extends javax.swing.JFrame {
             }
         });
         jPanel3.add(admin_reset_bttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 360, 60, -1));
+        jPanel3.add(admin_password, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 320, 190, -1));
 
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 10, 480, 450));
 
@@ -249,47 +236,43 @@ public class Login extends javax.swing.JFrame {
     private void loginbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginbtnActionPerformed
         // TODO add your handling code here:
          String user_name = uname.getText();
-        char[] passkey = password.getPassword();
+         char[] passkey = password.getPassword();
          String key = new String(passkey);
 
-        if(key.equals("") || username.equals("")){
+        if(key.equals("") || user_name.equals("")){
             JOptionPane.showMessageDialog(null, "Please fill user credentials");
             
         }
-        else{
-            
+        else if(user_name.equals(userName)||key.equals(ukey)){
              try {
-                 if (isValidUser(conn, username, key)) {
-                     System.out.println("Login successful!");
-                 }
-                 else {
-                     System.out.println("Invalid username or password. Please try again.");
-                 }} catch (SQLException e) {
+                 UserProfile user = new UserProfile();
+                 user.setVisible(true);
+                 this.dispose();
+             } catch (SQLException e) {
                  JOptionPane.showMessageDialog(null, e);
              }
-            }
-            UserProfile user = new UserProfile();
-            user.setVisible(true);
-            this.dispose();
-        
+        }else{
+        JOptionPane.showMessageDialog(this, "Wrong UserName or Password");
+        } 
     }//GEN-LAST:event_loginbtnActionPerformed
 
     private void loginadminbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginadminbtnActionPerformed
         // TODO add your handling code here:
-        String username = uname.getText();
-        char[] passkey = password.getPassword();
-        String key = new String(passkey);
+        String ad_name = admin_name.getText();
+         char[] ad_passkey = admin_password.getPassword();
+         String ad_key = new String(ad_passkey);
 
-        if(key.equals("") || username.equals("")){
-            JOptionPane.showMessageDialog(null, "Please fill user credentials");
-            admin_name.setText("");
-            admin_password.setText("");
+        if(ad_key.equals("") || ad_name.equals("")){
+            JOptionPane.showMessageDialog(null, "Please fill admin credentials");
+            
         }
-        else{
-            AdminProfile admin = new AdminProfile();
-            admin.setVisible(true);
+        else if(ad_name.equals(adminName)||ad_key.equals(adminkey)){
+            AdminProfile user = new AdminProfile();
+            user.setVisible(true);
             this.dispose();
-        }
+        }else{
+        JOptionPane.showMessageDialog(this, "Wrong Administrator Name or Password");
+        } 
 
     }//GEN-LAST:event_loginadminbtnActionPerformed
 
@@ -354,7 +337,7 @@ public class Login extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Login().setVisible(true);
+            new Login().setVisible(true);
                 
             }
         });
@@ -363,7 +346,7 @@ public class Login extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton adminReg_bttn;
     private javax.swing.JTextField admin_name;
-    private javax.swing.JTextField admin_password;
+    private javax.swing.JPasswordField admin_password;
     private javax.swing.JButton admin_reset_bttn;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

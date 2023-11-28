@@ -1,5 +1,12 @@
 package GUI;
 
+import CODE.DbConnect;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -11,11 +18,11 @@ package GUI;
  */
 public class UpdateAdminInfo extends javax.swing.JFrame {
 
-    /**
-     * Creates new form UpdateAdminInfo
-     */
+    Connection conn = null;
+    PreparedStatement pst = null;
     public UpdateAdminInfo() {
         initComponents();
+        conn= DbConnect.connect();
     }
 
     /**
@@ -32,12 +39,12 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        newContact = new javax.swing.JPasswordField();
+        newPassword = new javax.swing.JPasswordField();
         jLabel3 = new javax.swing.JLabel();
         oldPassword = new javax.swing.JPasswordField();
-        newPassword = new javax.swing.JTextField();
+        newNumber = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        updateinfobtn = new javax.swing.JButton();
+        updateinfo_bttn = new javax.swing.JButton();
         clear_bttn = new javax.swing.JButton();
         back_bttn = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
@@ -69,20 +76,7 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Contact : ");
-        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, -1, 20));
-
-        newContact.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newContactActionPerformed(evt);
-            }
-        });
-        jPanel3.add(newContact, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 110, 220, -1));
-
-        jLabel3.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Old Password :");
-        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, -1, 20));
-        jPanel3.add(oldPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 150, 220, -1));
+        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, -1, 20));
 
         newPassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -91,21 +85,34 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
         });
         jPanel3.add(newPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 190, 220, -1));
 
+        jLabel3.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Old Password :");
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 150, -1, 20));
+        jPanel3.add(oldPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 150, 220, -1));
+
+        newNumber.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newNumberActionPerformed(evt);
+            }
+        });
+        jPanel3.add(newNumber, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 110, 220, -1));
+
         jLabel4.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("New Password :");
         jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 190, -1, 20));
 
-        updateinfobtn.setBackground(new java.awt.Color(204, 204, 204));
-        updateinfobtn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
-        updateinfobtn.setText("Update");
-        updateinfobtn.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        updateinfobtn.addActionListener(new java.awt.event.ActionListener() {
+        updateinfo_bttn.setBackground(new java.awt.Color(204, 204, 204));
+        updateinfo_bttn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        updateinfo_bttn.setText("Update");
+        updateinfo_bttn.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        updateinfo_bttn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateinfobtnActionPerformed(evt);
+                updateinfo_bttnActionPerformed(evt);
             }
         });
-        jPanel3.add(updateinfobtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 240, 70, -1));
+        jPanel3.add(updateinfo_bttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 240, 70, -1));
 
         clear_bttn.setBackground(new java.awt.Color(204, 204, 204));
         clear_bttn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -156,21 +163,55 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void newContactActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newContactActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_newContactActionPerformed
-
     private void newPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newPasswordActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_newPasswordActionPerformed
 
-    private void updateinfobtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateinfobtnActionPerformed
+    private void newNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newNumberActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_newNumberActionPerformed
+
+    private void updateinfo_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateinfo_bttnActionPerformed
         // TODO add your handling code here:
         String oldn = oldname.getText();
         String newn = newname.getText();
-        String oldp = String.valueOf(newContact.getPassword());
-        String newp = String.valueOf(oldPassword.getPassword());
-    }//GEN-LAST:event_updateinfobtnActionPerformed
+        String oldp = String.valueOf(oldPassword.getPassword());
+        String newp = String.valueOf(newPassword.getPassword());
+        String nContact = newNumber.getText();
+       
+        
+        if(oldn.isEmpty()|| newn.isEmpty()||oldp.isEmpty()||newp.isEmpty()|| nContact.isEmpty()){
+            JOptionPane.showMessageDialog(this, " Please Enter Details");}
+        else if(newp.length() < 8||newp.equals(oldp)){
+            JOptionPane.showMessageDialog(null, "Check the new Password again!");
+        }else if(oldn.equals(newn)){
+        JOptionPane.showMessageDialog(null, "Don't use old name.");}
+        else if(nContact.length()!= 10){
+        JOptionPane.showMessageDialog(null, "Check the new conatct number again");}
+        else{
+            try{
+                if (this.conn == null || this.conn.isClosed()) {
+                // Re-establish the connection
+                String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+                String username = "root";
+                String password = "";
+                this.conn = DriverManager.getConnection(jdbcUrl, username, password);
+                }
+                String sql = "UPDATE admin SET admin_Name = ?, admin_password =?, admin_contact_no = ? WHERE admin_name=? , admin_password=?";
+                PreparedStatement add = conn.prepareStatement(sql);
+                add.setString(1,newn);
+                add.setString(2,newp);
+                add.setString(3,nContact);
+                add.setString(4,oldn);
+                add.setString(5,oldp);
+                add.executeUpdate();
+                JOptionPane.showMessageDialog(null,"Update Sucessfully!");
+                
+            }catch(SQLException e){
+                JOptionPane.showMessageDialog(null,e);
+            }
+        }
+    }//GEN-LAST:event_updateinfo_bttnActionPerformed
 
     private void newnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newnameActionPerformed
         // TODO add your handling code here:
@@ -187,9 +228,9 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
         // TODO add your handling code here:
         oldname.setText("");
         newname.setText("");
-        newContact.setText("");
-        oldPassword.setText("");
         newPassword.setText("");
+        oldPassword.setText("");
+        newNumber.setText("");
     }//GEN-LAST:event_clear_bttnActionPerformed
 
     /**
@@ -239,11 +280,11 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPasswordField newContact;
-    private javax.swing.JTextField newPassword;
+    private javax.swing.JTextField newNumber;
+    private javax.swing.JPasswordField newPassword;
     private javax.swing.JTextField newname;
     private javax.swing.JPasswordField oldPassword;
     private javax.swing.JTextField oldname;
-    private javax.swing.JButton updateinfobtn;
+    private javax.swing.JButton updateinfo_bttn;
     // End of variables declaration//GEN-END:variables
 }

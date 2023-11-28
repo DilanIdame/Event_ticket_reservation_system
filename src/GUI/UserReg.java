@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.Connection;
 import javax.swing.JOptionPane;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 
 
@@ -13,9 +14,11 @@ public class UserReg extends javax.swing.JFrame {
     Connection conn = null;
     PreparedStatement pst = null;
     
-    public UserReg() {
+    public UserReg() throws SQLException {
         initComponents();
-        conn= (Connection) DbConnect.connect();
+        conn= DbConnect.connect();
+        // If connection lost with DbConnect 
+        Reconnect();
     }
 
     /**
@@ -37,10 +40,10 @@ public class UserReg extends javax.swing.JFrame {
         uName = new javax.swing.JTextField();
         eMail = new javax.swing.JTextField();
         contact = new javax.swing.JTextField();
-        password = new javax.swing.JTextField();
         register_bttn = new javax.swing.JButton();
         clear_bttn = new javax.swing.JButton();
         back_log_bttn = new javax.swing.JButton();
+        password = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -82,7 +85,6 @@ public class UserReg extends javax.swing.JFrame {
         jPanel1.add(uName, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 130, 210, -1));
         jPanel1.add(eMail, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 170, 210, -1));
         jPanel1.add(contact, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 210, 210, -1));
-        jPanel1.add(password, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 250, 210, -1));
 
         register_bttn.setBackground(new java.awt.Color(204, 204, 204));
         register_bttn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -101,6 +103,11 @@ public class UserReg extends javax.swing.JFrame {
         clear_bttn.setText("Clear");
         clear_bttn.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         clear_bttn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        clear_bttn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clear_bttnActionPerformed(evt);
+            }
+        });
         jPanel1.add(clear_bttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 300, 50, 30));
 
         back_log_bttn.setBackground(new java.awt.Color(204, 204, 204));
@@ -114,6 +121,7 @@ public class UserReg extends javax.swing.JFrame {
             }
         });
         jPanel1.add(back_log_bttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 300, 40, 30));
+        jPanel1.add(password, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 250, 210, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, -2, 490, 380));
 
@@ -123,16 +131,10 @@ public class UserReg extends javax.swing.JFrame {
 
     private void register_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_register_bttnActionPerformed
         // TODO add your handling code here:
-        
-        String user_name ;
-        String user_password;
-        String user_email;
-        String user_number;
-        
-        user_name = uName.getText();
-        user_password = password.getText();
-        user_email = eMail.getText();
-        user_number = contact.getText();
+        String user_name = uName.getText();
+        String user_password = String.valueOf(password.getPassword());
+        String user_email = eMail.getText();
+        String user_number = contact.getText();
         
         if(user_name.equals("") || user_password.equals("") || user_number.equals("") || user_email.equals("")){
             JOptionPane.showMessageDialog(null, "Fill all the fields!");
@@ -141,27 +143,29 @@ public class UserReg extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "The password should contain at least 8 characters!");
         }
         else if(user_number.length()!= 10){
-        JOptionPane.showMessageDialog(null, "Check the conatct number again");
+            JOptionPane.showMessageDialog(null, "Check the conatct number again");
+        }else if(! user_email.contains("@")){
+            JOptionPane.showMessageDialog(null, "Enter a valid E-mail address.");    
         }
         else{
         try {
-            if (this.conn == null || this.conn.isClosed()) {
-        // Re-establish the connection
-            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
-            String username = "root";
-            String password = "";
-            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
-            }
-            String sql = "INSERT INTO user(user_name, user_password, mobile_number, email)VALUES ('"+user_name+"','"+user_password+"','"+user_number+"','"+user_email+"')";
-            pst = conn.prepareStatement(sql);
-            pst.execute();
-            JOptionPane.showMessageDialog(null,"Registration Sucessfull!");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,e);
+            String sql = "INSERT INTO user(user_name, user_password, mobile_number, email)VALUES (?,?,?,?)";
+            PreparedStatement add = conn.prepareStatement(sql);
+            add.setString(1, user_name);
+            add.setString(2, user_password);
+            add.setString(3, user_number);
+            add.setString(4, user_email);
+            int rowsAffected = add.executeUpdate();
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(null, "User Registration Successful!");
+                        Login admin = new Login();
+                        admin.setVisible(true);
+                        this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "User Registration Failed!\n Try Again!");}
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs at User registration : "+e);
         }
-        Login login = new Login();
-        login.setVisible(true);
-        this.dispose();
         }
     }//GEN-LAST:event_register_bttnActionPerformed
 
@@ -171,6 +175,14 @@ public class UserReg extends javax.swing.JFrame {
         admin.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_back_log_bttnActionPerformed
+
+    private void clear_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_bttnActionPerformed
+        // TODO add your handling code here:
+        uName.setText("");
+        eMail.setText("");
+        contact.setText("");
+        password.setText("");
+    }//GEN-LAST:event_clear_bttnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -203,7 +215,11 @@ public class UserReg extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new UserReg().setVisible(true);
+                try {
+                    new UserReg().setVisible(true);
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null,"Error occurs at User UserReg Main : "+e);
+                }
             }
         });
     }
@@ -220,22 +236,21 @@ public class UserReg extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JTextField password;
+    private javax.swing.JPasswordField password;
     private javax.swing.JButton register_bttn;
     private javax.swing.JTextField uName;
     // End of variables declaration//GEN-END:variables
-
-    /**
-     * @return the pst
-     */
-    public PreparedStatement getPst() {
-        return pst;
-    }
-
-    /**
-     * @param pst the pst to set
-     */
-    public void setPst(PreparedStatement pst) {
-        this.pst = pst;
-    }
+private void Reconnect() throws SQLException{
+    if (this.conn == null || this.conn.isClosed()) {
+        try {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String db_password = null;
+            this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        }
+}
+}
 }

@@ -4,8 +4,9 @@
  */
 package CODE;
 
-import com.sun.jdi.connect.spi.Connection;
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 /**
@@ -23,8 +24,8 @@ public class DbConnect {
             String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
             String username = "root";
             String password = "";
-            conn = (Connection) DriverManager.getConnection(jdbcUrl, username, password);
-         }catch(Exception e){
+            conn = DriverManager.getConnection(jdbcUrl, username, password);
+         }catch(ClassNotFoundException | SQLException e){
              JOptionPane.showMessageDialog(null,e);
          }
          

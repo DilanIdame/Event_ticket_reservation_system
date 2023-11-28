@@ -136,6 +136,7 @@
             </Property>
           </Properties>
           <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="eventboxMouseClicked"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="eventboxActionPerformed"/>
           </Events>
           <AuxValues>
@@ -169,7 +170,7 @@
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="60" y="200" width="930" height="90"/>
+              <AbsoluteConstraints x="60" y="200" width="930" height="60"/>
             </Constraint>
           </Constraints>
 
@@ -223,16 +224,10 @@
             <Component class="javax.swing.JTable" name="ticketTable">
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                  <Table columnCount="9" rowCount="1">
-                    <Column editable="false" title="A" type="java.lang.Integer"/>
-                    <Column editable="false" title="Available A - seats" type="java.lang.Integer"/>
-                    <Column editable="false" title="Booked A - seats" type="java.lang.Integer"/>
-                    <Column editable="false" title="B " type="java.lang.Integer"/>
-                    <Column editable="false" title="Available B - seats" type="java.lang.Integer"/>
-                    <Column editable="false" title="Booked B - seats" type="java.lang.Object"/>
-                    <Column editable="false" title="C" type="java.lang.Object"/>
-                    <Column editable="false" title="Availabe C - seats" type="java.lang.Object"/>
-                    <Column editable="false" title="Booked C - seats" type="java.lang.Object"/>
+                  <Table columnCount="3" rowCount="4">
+                    <Column editable="false" title="Category (Type)" type="java.lang.Integer"/>
+                    <Column editable="false" title="Available  seats" type="java.lang.Integer"/>
+                    <Column editable="false" title="Booked  seats" type="java.lang.Integer"/>
                   </Table>
                 </Property>
                 <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">

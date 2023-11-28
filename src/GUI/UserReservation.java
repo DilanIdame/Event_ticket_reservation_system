@@ -4,17 +4,37 @@
  */
 package GUI;
 
+import CODE.DbConnect;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author User
  */
 public class UserReservation extends javax.swing.JFrame {
-
+    Connection conn = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+    public int userID = 0;
+    
     /**
      * Creates new form UserReservation
      */
     public UserReservation() {
         initComponents();
+        conn= DbConnect.connect();
+        try {
+            showTable();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex);
+        }
+        
     }
 
     /**
@@ -74,21 +94,33 @@ public class UserReservation extends javax.swing.JFrame {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.String.class, java.lang.Integer.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
         jScrollPane1.setViewportView(res_ticket_reservation);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 150, -1, 90));
-        jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 273, 570, 10));
+        jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 280, 570, -1));
 
         jLabel3.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Reserved Ticket Details :");
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 240, 30));
 
+        select_ticket.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                select_ticketActionPerformed(evt);
+            }
+        });
         jPanel1.add(select_ticket, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 320, 450, -1));
 
         cancle_bttn.setBackground(new java.awt.Color(204, 204, 204));
@@ -123,14 +155,50 @@ public class UserReservation extends javax.swing.JFrame {
 
     private void cancle_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancle_bttnActionPerformed
         // TODO add your handling code here:
+        JOptionPane.showMessageDialog(null, "Do you want to remove the reservation?");
+        try{String sql2 = "DELETE FROM  booking  where user_ID = ?";
+        PreparedStatement add = conn.prepareStatement(sql2);
+        add.setInt(1, userID);
+        add.executeQuery();
+        JOptionPane.showMessageDialog(null, "Resrvation successfully cancled!");
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        }
     }//GEN-LAST:event_cancle_bttnActionPerformed
 
     private void back_user_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_back_user_bttnActionPerformed
-        // TODO add your handling code here:
-        UserProfile user = new UserProfile();
-        user.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here
+            UserProfile user = new UserProfile();
+            user.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex);
+        }
+    
+        
     }//GEN-LAST:event_back_user_bttnActionPerformed
+
+    private void select_ticketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_select_ticketActionPerformed
+        // TODO add your handling code here:
+        try{
+       
+        String sql1 = "SELECT event_table.event_Name FROM booking JOIN event_table ON booking.event_ID = event_table.event_ID where user_ID=?";
+        PreparedStatement add = conn.prepareStatement(sql1);
+        add.setInt(1, userID);
+        rs = add.executeQuery();
+        
+        while(rs.next()){
+            String name = rs.getString("event_name");
+            select_ticket.addItem(name);
+        }
+        conn.close();
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        
+        }
+    }//GEN-LAST:event_select_ticketActionPerformed
 
     /**
      * @param args the command line arguments
@@ -161,8 +229,10 @@ public class UserReservation extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new UserReservation().setVisible(true);
+                
             }
         });
     }
@@ -180,4 +250,37 @@ public class UserReservation extends javax.swing.JFrame {
     private javax.swing.JTable res_ticket_reservation;
     private javax.swing.JComboBox<String> select_ticket;
     // End of variables declaration//GEN-END:variables
+
+    private void showTable() throws SQLException {
+        try {
+            try {
+            if (this.conn == null || this.conn.isClosed()) {
+                // Re-establish the connection
+                String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+                String username = "root";
+                String password = "";
+                this.conn = DriverManager.getConnection(jdbcUrl, username, password);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,e);
+        }
+            String sql2 = "SELECT seats.seat_category,seats.NoOf_seats,event_table.event_Name FROM seats JOIN event_table ON seats.event_ID = event_table.event_ID";
+            pst = conn.prepareStatement(sql2);
+            rs = pst.executeQuery();
+            while(rs.next()){
+                String seat_type = rs.getString("seat_category");
+                String number_of = String.valueOf(rs.getInt("NoOf_seats"));
+                String eventName = rs.getString("event_Name");
+                
+                String tbData[]= {seat_type,number_of ,eventName};
+                DefaultTableModel tblModel = (DefaultTableModel)res_ticket_reservation.getModel();
+                
+                tblModel.addRow(tbData);
+            }
+             }
+        catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,e);
+            }
+    }
+
 }

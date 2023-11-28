@@ -9,15 +9,20 @@ import CODE.DbConnect;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.table.DefaultTableModel;
 
 public class AdminProfile extends javax.swing.JFrame {
 
     Connection conn = null;
     PreparedStatement pst =null;
     ResultSet rs = null;
+    public String name;
     public AdminProfile() {
-        initComponents();
-        conn= (Connection) DbConnect.connect();
+        
+            initComponents();
+            conn= DbConnect.connect();
+            
     }
 
     /**
@@ -65,6 +70,11 @@ public class AdminProfile extends javax.swing.JFrame {
         jLabel2.setText("Find event: ");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, -1, 20));
 
+        eventbox.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                eventboxMouseClicked(evt);
+            }
+        });
         eventbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 eventboxActionPerformed(evt);
@@ -103,7 +113,7 @@ public class AdminProfile extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(evenTable);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 200, 930, 90));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 200, 930, 60));
 
         jLabel4.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
@@ -112,17 +122,20 @@ public class AdminProfile extends javax.swing.JFrame {
 
         ticketTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "A", "Available A - seats", "Booked A - seats", "B ", "Available B - seats", "Booked B - seats", "C", "Availabe C - seats", "Booked C - seats"
+                "Category (Type)", "Available  seats", "Booked  seats"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
+                false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -193,33 +206,18 @@ public class AdminProfile extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void eventboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eventboxActionPerformed
-        // TODO add your handling code here:
-        try{
-        if (this.conn == null || this.conn.isClosed()) {
-        // Re-establish the connection
-            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
-            String username = "root";
-            String password = "";
-            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
-            }
-        String sql = "SELECT event_name FROM event";
-        pst = conn.prepareStatement(sql);
-        rs = pst.executeQuery();
-        
-        while(rs.next()){
-            String name = rs.getString("event_name");
-            eventbox.addItem(name);
-        }
-        conn.close();
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(null, e);
-        
-        }
-        
+
     }//GEN-LAST:event_eventboxActionPerformed
 
     private void statusbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusbtnActionPerformed
-        // TODO add your handling code here:
+        try {
+            showEvent();
+            showTickets();
+        } catch (SQLException ex) {
+           JOptionPane.showMessageDialog(null, ex);
+
+        }
+        
         
         
     }//GEN-LAST:event_statusbtnActionPerformed
@@ -244,6 +242,31 @@ public class AdminProfile extends javax.swing.JFrame {
         admin_event.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_add_event_bttnActionPerformed
+
+    private void eventboxMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_eventboxMouseClicked
+        // TODO add your handling code here:
+        try{
+            if (this.conn == null || this.conn.isClosed()) {
+        // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String password = "";
+            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
+            }
+        String sql_eventBox = "SELECT event_name FROM event_table";
+            PreparedStatement add = conn.prepareStatement(sql_eventBox);
+            rs = add.executeQuery();
+        
+        while(rs.next()){
+            name = rs.getString("event_name");
+            eventbox.addItem(name);
+        }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+        
+        }
+        
+    }//GEN-LAST:event_eventboxMouseClicked
 
     /**
      * @param args the command line arguments
@@ -299,4 +322,42 @@ public class AdminProfile extends javax.swing.JFrame {
     private javax.swing.JButton statusbtn;
     private javax.swing.JTable ticketTable;
     // End of variables declaration//GEN-END:variables
+
+private void showEvent() throws SQLException {
+        
+        try {
+            // TODO add your handling code here:
+            String sql_A = "SELECT * FROM event_table where event_name=?";
+            PreparedStatement add = conn.prepareStatement(sql_A);
+            add.setString(1, name);
+            rs = add.executeQuery();
+            
+            String event = rs.getString("event_Name");
+            String venue = rs.getString("venue");
+            String time = rs.getString("date");
+            String about = rs.getString("about");
+            DefaultTableModel tableModel = (DefaultTableModel)evenTable.getModel();
+            tableModel.addRow(new Object[]{event,venue, time, about});
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex);
+        }
+    }
+private void showTickets() throws SQLException {
+        
+        try {
+            // TODO add your handling code here:
+            String sql_B = "SELECT seat_category, NoOf_seats,available_seats FROM seats where event_name=? JOIN event_table ON seats.event_ID = event_table.event_ID";
+            PreparedStatement add = conn.prepareStatement(sql_B);
+            add.setString(1, name);
+            rs = add.executeQuery();
+            
+            String type = rs.getString("seat_category");
+            int seats = rs.getInt("NoOf_seats");
+            int available_seats = rs.getInt("available_setas");
+            DefaultTableModel tableModel = (DefaultTableModel)evenTable.getModel();
+            tableModel.addRow(new Object[]{type, seats, available_seats});
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex);
+        }
+    }
 }

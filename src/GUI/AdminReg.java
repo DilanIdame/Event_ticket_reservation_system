@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package GUI;
 
 import javax.swing.JOptionPane;
@@ -9,15 +6,18 @@ import java.sql.DriverManager;
 import CODE.DbConnect;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 
 public class AdminReg extends javax.swing.JFrame {
     Connection conn = null;
     PreparedStatement pst;
   
-    public AdminReg() {
+    public AdminReg() throws SQLException {
         initComponents();
-        conn= (Connection) DbConnect.connect();
+        conn= DbConnect.connect();
+       // If connection lost with DbConnect 
+        Reconnect();
     }
 
     /**
@@ -140,12 +140,11 @@ public class AdminReg extends javax.swing.JFrame {
         String admin_name = adminName.getText();
         String admin_contact = contact.getText();
         String admin_password = String.valueOf(password.getPassword());
-        //String id = nic.getText();
 
         if(admin_name.equals("") || admin_contact.equals("") || admin_password.equals("")){
             JOptionPane.showMessageDialog(null, "Fill all the fields!");
         }
-        else if(admin_password.length() < 8){
+        else if(admin_password.length() < 8  ){
             JOptionPane.showMessageDialog(null, "The password should contain at least 8 characters!");
         }
         else if(admin_contact.length()!= 10){
@@ -153,29 +152,30 @@ public class AdminReg extends javax.swing.JFrame {
         }
         else{
             try {
-            if (this.conn == null || this.conn.isClosed()) {
-        // Re-establish the connection
-            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
-            String username = "root";
-            String password = "";
-            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
-            }
-            String sql = "INSERT INTO admin(admin_Name, admin_contact_no, admin_password) VALUES ('"+admin_name+"','"+admin_contact+"','"+admin_password+"')";
-            pst = conn.prepareStatement(sql);
-            pst.execute();
-            JOptionPane.showMessageDialog(null,"Registration Sucessfull!");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null,e);
+            String sql = "INSERT INTO admin(admin_Name, admin_contact_no, admin_password) VALUES (?,?,?)";
+            PreparedStatement add = conn.prepareStatement(sql);
+            add.setString(1, admin_name);
+            add.setString(2, admin_contact);
+            add.setString(3, admin_password);
+            int rowsAffected = add.executeUpdate();
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(null, "Registration Successful!");
+                        Login admin = new Login();
+                        admin.setVisible(true);
+                        this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Registration Failed!\n Try Again!");}
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs at regbttn : "+e);
         }
-        Login admin = new Login();
-        admin.setVisible(true);
-        this.dispose();
         }
     }//GEN-LAST:event_regbtnActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        
+        adminName.setText("");
+        contact.setText("");
+        password.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void Log_back_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Log_back_bttnActionPerformed
@@ -218,8 +218,13 @@ public class AdminReg extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new AdminReg().setVisible(true);
+                try {
+                    new AdminReg().setVisible(true);
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null,"Error occurs at AdminReg main : "+e);
+                }
             }
         });
     }
@@ -238,4 +243,18 @@ public class AdminReg extends javax.swing.JFrame {
     private javax.swing.JPasswordField password;
     private javax.swing.JButton regbtn;
     // End of variables declaration//GEN-END:variables
+private void Reconnect() throws SQLException{
+    if (this.conn == null || this.conn.isClosed()) {
+        try {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String db_password = null;
+            this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        }
+}
+    
+}
 }

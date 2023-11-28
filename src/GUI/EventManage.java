@@ -4,19 +4,59 @@
  */
 package GUI;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import javax.swing.JOptionPane;
+import CODE.DbConnect;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author User
  */
 public class EventManage extends javax.swing.JFrame {
-
+    Connection conn = null;
+    PreparedStatement pst;
+    public int user_ID =0;
     /**
      * Creates new form EventManage
      */
     public EventManage() {
         initComponents();
+        conn= DbConnect.connect();
+        
     }
-
+    
+    public String categoryN;
+    public int seatPrice,seatNo ;
+    
+    public void getTable(){
+        DefaultTableModel tblModel1 = (DefaultTableModel) new_ticket_details.getModel();
+        if (tblModel1.getRowCount() == 0){
+            JOptionPane.showMessageDialog(this,"table is empty");
+        }
+        else{
+            for(int i=0; i<tblModel1.getRowCount();i++){
+                try {
+                    categoryN = tblModel1.getValueAt(i, 0).toString();
+                    seatNo =  (int) tblModel1.getValueAt(i, 1);
+                    seatPrice =  (int) tblModel1.getValueAt(i, 2);
+                    String sql_add = "insert into seats(seat_category,NoOf_seats,seat_price ) values (?,?,?)";
+                    PreparedStatement pst =conn.prepareStatement(sql_add);
+                    pst.setString(1,categoryN);
+                    pst.setInt(2,seatNo);
+                    pst.setInt(2,seatPrice);
+                    pst.execute();
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this,ex);
+                }
+            }
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -52,7 +92,6 @@ public class EventManage extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         select_event = new java.awt.Choice();
         jSeparator1 = new javax.swing.JSeparator();
-        select_bttn = new javax.swing.JButton();
         jLabel13 = new javax.swing.JLabel();
         updateVenue = new javax.swing.JTextField();
         updateDate = new javax.swing.JTextField();
@@ -165,6 +204,11 @@ public class EventManage extends javax.swing.JFrame {
         clear_bttn1.setText("Clear");
         clear_bttn1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         clear_bttn1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        clear_bttn1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clear_bttn1ActionPerformed(evt);
+            }
+        });
         jPanel3.add(clear_bttn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 220, 60, 30));
 
         back.setBackground(new java.awt.Color(204, 204, 204));
@@ -211,13 +255,6 @@ public class EventManage extends javax.swing.JFrame {
         jPanel4.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 140, 30));
         jPanel4.add(select_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 20, 470, 40));
         jPanel4.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 110, 900, 10));
-
-        select_bttn.setBackground(new java.awt.Color(204, 204, 204));
-        select_bttn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
-        select_bttn.setText("Select");
-        select_bttn.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        select_bttn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel4.add(select_bttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 70, 70, 30));
 
         jLabel13.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
         jLabel13.setForeground(new java.awt.Color(255, 255, 255));
@@ -284,7 +321,12 @@ public class EventManage extends javax.swing.JFrame {
         delete_event.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
         delete_event.setText("Delete Event");
         delete_event.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jPanel4.add(delete_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 70, 90, 30));
+        delete_event.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                delete_eventActionPerformed(evt);
+            }
+        });
+        jPanel4.add(delete_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 70, 90, 30));
 
         jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 360, 890, 330));
 
@@ -304,6 +346,50 @@ public class EventManage extends javax.swing.JFrame {
 
     private void addEventActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addEventActionPerformed
         // TODO add your handling code here:
+        String evName = new_event.getText();
+        String evVenue = new_venue.getText();
+        String evDate = new_date.getText();
+        String evAbout = new_about.getText();
+        //table.getTable();
+
+        try {
+        if (this.conn == null || this.conn.isClosed()) {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String password = "";
+            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
+        }
+
+        String sql = "INSERT INTO event_table(event_Name, venue, date, about) VALUES (?, ?, ?, ?)";
+        pst = conn.prepareStatement(sql);
+
+        // Set values using prepared statement parameters
+        pst.setString(1, evName);
+        pst.setString(2, evVenue);
+        pst.setString(3, evDate);
+        pst.setString(4, evAbout);
+
+        // Execute the update
+        pst.executeUpdate();
+
+        JOptionPane.showMessageDialog(null, "Inserted Successfully!");
+        } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, e);
+        } finally {
+        // Close the PreparedStatement in a finally block
+        try {
+            if (pst != null) {
+                pst.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+        Login admin = new Login();
+        admin.setVisible(true);
+        this.dispose();
+        
     }//GEN-LAST:event_addEventActionPerformed
 
     private void updateVenueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateVenueActionPerformed
@@ -312,6 +398,10 @@ public class EventManage extends javax.swing.JFrame {
 
     private void clear_bttn2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_bttn2ActionPerformed
         // TODO add your handling code here:
+        removeAllRows(updateTicket);
+        updateVenue.setText("");
+        updateDate.setText("");
+        updateAbout.setText(""); 
     }//GEN-LAST:event_clear_bttn2ActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
@@ -321,10 +411,130 @@ public class EventManage extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_backActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
+    private void clear_bttn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_bttn1ActionPerformed
+        // TODO add your handling code here:
+        new_event.setText("");
+        new_venue.setText("");
+        new_date.setText("");
+        new_about.setText("");
+        removeAllRows(new_ticket_details);
+    }//GEN-LAST:event_clear_bttn1ActionPerformed
+
+    private void select_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_select_bttnActionPerformed
+        // TODO add your handling code here:
+        try {
+        String event = String.valueOf(select_event.getSelectedItem());
+        DefaultTableModel model = (DefaultTableModel) updateTicket.getModel();
+
+        // Clear existing rows in the table
+        model.setRowCount(0);
+
+        if (this.conn == null || this.conn.isClosed()) {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String password = "";
+            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
+        }
+
+        String sql = "SELECT eventName, venue, date, about FROM event_table WHERE eventName = ?";
+        pst = conn.prepareStatement(sql);
+        pst.setString(1, event);
+        ResultSet resultSet = pst.executeQuery();
+
+        while (resultSet.next()) {
+            Object[] row = new Object[4];
+            row[0] = resultSet.getString("eventName");
+            row[1] = resultSet.getString("venue");
+            row[2] = resultSet.getString("date");
+            row[3] = resultSet.getString("about");
+            model.addRow(row);
+        }
+
+        // Move the message outside of the loop
+        JOptionPane.showMessageDialog(null, "Data retrieved successfully!");
+        } catch 
+            (Exception e) {
+        JOptionPane.showMessageDialog(null, e);
+        } finally {
+        // Close resources if needed
+        try {
+            if (pst != null) {
+                pst.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+        Login admin = new Login();
+        admin.setVisible(true);
+        this.dispose();
+        
+    }//GEN-LAST:event_select_bttnActionPerformed
+
+    private void Update_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Update_bttnActionPerformed
+        // TODO add your handling code here:
+        try {
+        if (this.conn == null || this.conn.isClosed()) {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String password = "";
+            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
+        }
+
+        DefaultTableModel model = (DefaultTableModel) updateTicket.getModel();
+
+        String updateSql = "UPDATE event_table SET venue=?, date=?, about=? WHERE eventName=?";
+        pst = conn.prepareStatement(updateSql);
+
+        int rowCount = model.getRowCount();
+
+        for (int i = 0; i < rowCount; i++) {
+            String eventName = (String) model.getValueAt(i, 0);
+            String venue = (String) model.getValueAt(i, 1);
+            String date = (String) model.getValueAt(i, 2);
+            String about = (String) model.getValueAt(i, 3);
+
+            pst.setString(1, venue);
+            pst.setString(2, date);
+            pst.setString(3, about);
+            pst.setString(4, eventName);
+
+            // Execute the update
+            pst.executeUpdate();
+        }
+
+        JOptionPane.showMessageDialog(null, "Database updated successfully!");
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, e);
+    } finally {
+        // Close resources if needed
+        try {
+            if (pst != null) {
+                pst.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    }//GEN-LAST:event_Update_bttnActionPerformed
+
+    private void delete_eventActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delete_eventActionPerformed
+        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(null, "Do you want to delete the event?");
+        try{String sql2 = "DELETE FROM  booking  where user_ID = ?";
+        PreparedStatement add = conn.prepareStatement(sql2);
+        add.setInt(1, userID);
+        add.executeQuery();
+        JOptionPane.showMessageDialog(null, "Event successfully delete!");
+        }
+        catch(SQLException e){
+            JOptionPane.showMessageDialog(null, e);
+    }//GEN-LAST:event_delete_eventActionPerformed
+
+    
+    }public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -352,6 +562,7 @@ public class EventManage extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new EventManage().setVisible(true);
+                EventManage table = new EventManage();
             }
         });
     }
@@ -388,11 +599,20 @@ public class EventManage extends javax.swing.JFrame {
     private javax.swing.JTextField new_event;
     private javax.swing.JTable new_ticket_details;
     private javax.swing.JTextField new_venue;
-    private javax.swing.JButton select_bttn;
     private java.awt.Choice select_event;
     private javax.swing.JTextArea updateAbout;
     private javax.swing.JTextField updateDate;
     private javax.swing.JTable updateTicket;
     private javax.swing.JTextField updateVenue;
     // End of variables declaration//GEN-END:variables
+
+    // clear table method
+    public static void removeAllRows(JTable table) {
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+        for (int row = 0; row < table.getRowCount(); row++) {
+            model.removeRow(row);
+        }
+    }
 }
