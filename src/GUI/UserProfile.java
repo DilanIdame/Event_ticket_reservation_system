@@ -9,50 +9,24 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.ResultSet;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class UserProfile extends javax.swing.JFrame {
 
     Connection conn = null;
-    PreparedStatement pst = null;
-    ResultSet rs = null;
     public String selectByUser;
+    String user_name ;
     
     
     public UserProfile() throws SQLException {
         initComponents();
-        conn = (Connection) DbConnect.connect();
-        if (this.conn == null || this.conn.isClosed()) {
-        // Re-establish the connection
-            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
-            String username = "root";
-            String password = "";
-            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
-            }
+        conn = DbConnect.connect();
+        Reconnect();
     }
-    public String eventN;
-    public String key;
-    public void tabledata(){
-        try{
-            String sql = "SELECT seat_category, NoOf_seats,seat_price FROM seats WHERE event_ID ";
-            
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(null,e);
-        }
-    }
-    public void showDetails( String r){
-        try{
-            
-            String sql = "SELECT seat_category, seat_price, NoOf_seats FROM seats WHERE event_ID =? ";
-            pst = conn.prepareStatement(sql);
-            boolean execute = pst.execute();
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(UserProfile.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+    
+
+    
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -277,11 +251,11 @@ public class UserProfile extends javax.swing.JFrame {
     private void editProfile_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editProfile_bttnActionPerformed
         try {
             // TODO add your handling code here:
-            UpdateUserInfo user = new UpdateUserInfo();
+            UpdateUserInfo user = new UpdateUserInfo(user_name);
             user.setVisible(true);
             this.dispose();
         } catch (SQLException ex) {
-            Logger.getLogger(UserProfile.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null,"Error occurs When edit profile button :"+ex);
         }
     }//GEN-LAST:event_editProfile_bttnActionPerformed
 
@@ -293,33 +267,30 @@ public class UserProfile extends javax.swing.JFrame {
     }//GEN-LAST:event_reservation_bttnActionPerformed
 
     private void logout_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logout_bttnActionPerformed
-        // TODO add your handling code here:
-        Login userLogout = new Login();
-        userLogout.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            Login userLogout = new Login();
+            userLogout.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null,"Error occurs When logout_bttn :"+ex);
+        }
     }//GEN-LAST:event_logout_bttnActionPerformed
 
     @SuppressWarnings("unchecked")
     private void eventComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eventComboActionPerformed
         // TODO add your handling code here:
             try{
-            if (this.conn == null || this.conn.isClosed()) {
-        // Re-establish the connection
-            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
-            String username = "root";
-            String password = "";
-            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
-            }
-        String sql_eventBox = "SELECT event_name FROM event_table";
+            String sql_eventBox = "SELECT event_name FROM event_table";
             PreparedStatement add = conn.prepareStatement(sql_eventBox);
-            rs = add.executeQuery();
+            ResultSet rs = add.executeQuery();
         
         while(rs.next()){
             selectByUser = rs.getString("event_name");
             eventCombo.addItem(selectByUser);
         }
         }catch(SQLException e){
-            JOptionPane.showMessageDialog(null, e);
+           JOptionPane.showMessageDialog(null,"Error occurs at combo box :"+e);
         
         }
     }//GEN-LAST:event_eventComboActionPerformed
@@ -369,7 +340,7 @@ public class UserProfile extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(UserProfile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
@@ -377,7 +348,7 @@ public class UserProfile extends javax.swing.JFrame {
                 try {
                     new UserProfile().setVisible(true);
                 } catch (SQLException ex) {
-                    Logger.getLogger(UserProfile.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(null,"Error occurs at UserProfile main :"+ex);
                 }
             }
         });
@@ -417,14 +388,17 @@ private void showDetails() throws SQLException {
             String sql_A = "SELECT * FROM event_table where event_name=?";
             PreparedStatement add = conn.prepareStatement(sql_A);
             add.setString(1, selectByUser);
-            rs = add.executeQuery();
+            ResultSet rs = add.executeQuery();
             
-            String event = rs.getString("event_Name");
+            DefaultTableModel tableModel = (DefaultTableModel)user_Event_Table.getModel(); 
+            
+            while(rs.next())
+            {String event = rs.getString("event_Name");
             String venue = rs.getString("venue");
             String time = rs.getString("date");
             String about = rs.getString("about");
-            DefaultTableModel tableModel = (DefaultTableModel)user_Event_Table.getModel();
-            tableModel.addRow(new Object[]{event,venue, time, about});
+            
+            tableModel.addRow(new Object[]{event,venue, time, about});}
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex);
         }
@@ -433,20 +407,35 @@ private void showUserTickets() throws SQLException {
         
         try {
             // TODO add your handling code here:
-            String sql_B = "SELECT seat_category, NoOf_seats,seat_price FROM seats where event_name=? JOIN event_table ON seats.event_ID = event_table.event_ID";
+            String sql_B = "SELECT seat_category, NoOf_seats,seat_price FROM seats JOIN event_table ON seats.event_ID = event_table.event_ID where event_name=?";
             PreparedStatement add = conn.prepareStatement(sql_B);
             add.setString(1, selectByUser);
-            rs = add.executeQuery();
+            ResultSet rs = add.executeQuery();
             
+            DefaultTableModel tableModel = (DefaultTableModel)ticket_detail_table.getModel();
+            
+            while(rs.next()){
             String type = rs.getString("seat_category");
             int seats = rs.getInt("NoOf_seats");
             int seat_price = rs.getInt("seat_price");
-            DefaultTableModel tableModel = (DefaultTableModel)ticket_detail_table.getModel();
-            tableModel.addRow(new Object[]{type, seats, seat_price});
+     
+            tableModel.addRow(new Object[]{type, seats, seat_price});}
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex);
+            JOptionPane.showMessageDialog(null, "Error occurs at showuserTicket : "+ex);
         }
     }
 
-
+private void Reconnect() throws SQLException{
+    if (this.conn == null || this.conn.isClosed()) {
+        try {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String db_password = null;
+            this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        }
+}
+}
 }

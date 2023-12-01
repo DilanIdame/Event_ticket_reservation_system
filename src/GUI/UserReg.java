@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.Connection;
 import javax.swing.JOptionPane;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
@@ -12,7 +13,6 @@ import java.sql.SQLException;
 public class UserReg extends javax.swing.JFrame {
 
     Connection conn = null;
-    PreparedStatement pst = null;
     
     public UserReg() throws SQLException {
         initComponents();
@@ -146,6 +146,8 @@ public class UserReg extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Check the conatct number again");
         }else if(! user_email.contains("@")){
             JOptionPane.showMessageDialog(null, "Enter a valid E-mail address.");    
+        }else if(checkUserName(user_name)){
+            JOptionPane.showMessageDialog(null, "Already Registered with this name. \n\bPlease Use different name");
         }
         else{
         try {
@@ -162,18 +164,23 @@ public class UserReg extends javax.swing.JFrame {
                         admin.setVisible(true);
                         this.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(null, "User Registration Failed!\n Try Again!");}
+                    JOptionPane.showMessageDialog(null, " Sorry! \nUser Registration Failed!");}
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,"Error occurs at User registration : "+e);
         }
         }
     }//GEN-LAST:event_register_bttnActionPerformed
 
+    @SuppressWarnings("UseSpecificCatch")
     private void back_log_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_back_log_bttnActionPerformed
-        // TODO add your handling code here:
-        Login admin = new Login();
-        admin.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            Login admin = new Login();
+            admin.setVisible(true);
+            this.dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null,"Error occurs at Back button : "+ex);
+        }
     }//GEN-LAST:event_back_log_bttnActionPerformed
 
     private void clear_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_bttnActionPerformed
@@ -252,5 +259,17 @@ private void Reconnect() throws SQLException{
             JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
         }
 }
+}
+private boolean checkUserName(String admin_name){
+    String sql = "SELECT  user_name FROM user WHERE user_name=?";
+        try{
+            PreparedStatement add = conn.prepareStatement(sql);
+            add.setString(1, admin_name);
+            ResultSet rst = add.executeQuery();
+            return rst.next();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs at checking AdminName : "+e);
+        }
+        return false;
 }
 }

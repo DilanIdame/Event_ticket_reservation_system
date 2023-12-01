@@ -6,12 +6,13 @@ import java.sql.DriverManager;
 import CODE.DbConnect;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
 public class AdminReg extends javax.swing.JFrame {
     Connection conn = null;
-    PreparedStatement pst;
+    
   
     public AdminReg() throws SQLException {
         initComponents();
@@ -149,8 +150,9 @@ public class AdminReg extends javax.swing.JFrame {
         }
         else if(admin_contact.length()!= 10){
             JOptionPane.showMessageDialog(null, "Check the conatct number again");
-        }
-        else{
+        }else if(checkAdminName(admin_name)){
+            JOptionPane.showMessageDialog(null, "Already Registered with this name. \n\bPlease Use different Admin name");
+        }else{
             try {
             String sql = "INSERT INTO admin(admin_Name, admin_contact_no, admin_password) VALUES (?,?,?)";
             PreparedStatement add = conn.prepareStatement(sql);
@@ -160,7 +162,7 @@ public class AdminReg extends javax.swing.JFrame {
             int rowsAffected = add.executeUpdate();
                 if (rowsAffected > 0) {
                     JOptionPane.showMessageDialog(null, "Registration Successful!");
-                        Login admin = new Login();
+                        LoginAdmin admin = new LoginAdmin();
                         admin.setVisible(true);
                         this.dispose();
                 } else {
@@ -179,10 +181,14 @@ public class AdminReg extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void Log_back_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Log_back_bttnActionPerformed
-        // TODO add your handling code here:
-        Login admin = new Login();
-        admin.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            LoginAdmin admin = new LoginAdmin();
+            admin.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null,"Error occurs at regbttn : "+ex);
+        }
     }//GEN-LAST:event_Log_back_bttnActionPerformed
 
     private void adminNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminNameActionPerformed
@@ -254,7 +260,18 @@ private void Reconnect() throws SQLException{
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
         }
+    }
 }
-    
+private boolean checkAdminName(String admin_name){
+    String sql = "SELECT  admin_Name FROM admin WHERE admin_Name=?";
+        try{
+            PreparedStatement add = conn.prepareStatement(sql);
+            add.setString(1, admin_name);
+            ResultSet rst = add.executeQuery();
+            return rst.next();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs at checking AdminName : "+e);
+        }
+        return false;
 }
 }
