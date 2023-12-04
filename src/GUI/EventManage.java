@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
 import CODE.DbConnect;
+import java.awt.HeadlessException;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import javax.swing.JTable;
@@ -20,7 +21,6 @@ import javax.swing.table.DefaultTableModel;
  */
 public class EventManage extends javax.swing.JFrame {
     Connection conn = null;
-    PreparedStatement pst;
     public int user_ID =0;
     /**
      * Creates new form EventManage
@@ -103,6 +103,8 @@ public class EventManage extends javax.swing.JFrame {
         Update_bttn = new javax.swing.JButton();
         clear_bttn2 = new javax.swing.JButton();
         delete_event = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        admin_name = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -116,7 +118,7 @@ public class EventManage extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Sitka Text", 1, 42)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 102, 102));
         jLabel1.setText(" Event Management ");
-        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 20, 430, -1));
+        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 20, 430, -1));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 920, 80));
 
@@ -158,7 +160,7 @@ public class EventManage extends javax.swing.JFrame {
         new_about.setRows(5);
         jScrollPane1.setViewportView(new_about);
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 120, 230, 80));
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 120, 230, 50));
 
         new_ticket_details.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -229,7 +231,7 @@ public class EventManage extends javax.swing.JFrame {
         jLabel7.setText("Venue :");
         jPanel3.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 80, 70, 30));
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 900, 270));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 890, 270));
 
         jPanel4.setBackground(new java.awt.Color(0, 102, 102));
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, " Update Event ", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Calisto MT", 1, 18), new java.awt.Color(255, 255, 255))); // NOI18N
@@ -329,9 +331,15 @@ public class EventManage extends javax.swing.JFrame {
         });
         jPanel4.add(delete_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 70, 90, 30));
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 360, 890, 330));
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 440, 890, 330));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 920, 700));
+        jLabel5.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel5.setText("Admin name :");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 120, 30));
+        jPanel1.add(admin_name, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 110, 700, -1));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 920, 790));
 
         pack();
         setLocationRelativeTo(null);
@@ -354,29 +362,28 @@ public class EventManage extends javax.swing.JFrame {
         //table.getTable();
 
         try {
-        if (this.conn == null || this.conn.isClosed()) {
-            // Re-establish the connection
-            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
-            String username = "root";
-            String password = "";
-            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
-        }
-
         String sql = "INSERT INTO event_table(event_Name, venue, date, about) VALUES (?, ?, ?, ?)";
-        pst = conn.prepareStatement(sql);
+        PreparedStatement add = conn.prepareStatement(sql);
 
         // Set values using prepared statement parameters
-        pst.setString(1, evName);
-        pst.setString(2, evVenue);
-        pst.setString(3, evDate);
-        pst.setString(4, evAbout);
+        add.setString(1, evName);
+        add.setString(2, evVenue);
+        add.setString(3, evDate);
+        add.setString(4, evAbout);
 
         // Execute the update
-        pst.executeUpdate();
-
-        JOptionPane.showMessageDialog(null, "Inserted Successfully!");
-        } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, e);
+        int rowsAffected = add.executeUpdate();
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(null, "Event Added!");
+                    new_event.setText("");
+                    new_venue.setText("");
+                    new_date.setText("");
+                    new_about.setText("");
+                    removeAllRows(new_ticket_details);
+                } else {
+                    JOptionPane.showMessageDialog(null, " Failed!\n Try Again!");}
+        } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error occurs at Adding event : "+e);
         } finally {
         // Close the PreparedStatement in a finally block
         try {
@@ -571,6 +578,7 @@ public class EventManage extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Update_bttn;
     private javax.swing.JButton addEvent;
+    private javax.swing.JTextField admin_name;
     private javax.swing.JButton back;
     private javax.swing.JButton clear_bttn1;
     private javax.swing.JButton clear_bttn2;
@@ -582,6 +590,7 @@ public class EventManage extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
