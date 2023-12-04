@@ -4,13 +4,9 @@ import CODE.DbConnect;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 
 /**
  *
@@ -19,10 +15,11 @@ import javax.swing.JOptionPane;
 public class UpdateAdminInfo extends javax.swing.JFrame {
 
     Connection conn = null;
-    PreparedStatement pst = null;
-    public UpdateAdminInfo() {
+
+    public UpdateAdminInfo() throws SQLException {
         initComponents();
         conn= DbConnect.connect();
+        Reconnect();
     }
 
     /**
@@ -182,10 +179,12 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
         
         if(oldn.isEmpty()|| newn.isEmpty()||oldp.isEmpty()||newp.isEmpty()|| nContact.isEmpty()){
             JOptionPane.showMessageDialog(this, " Please Enter Details");}
-        else if(newp.length() < 8||newp.equals(oldp)){
+        else if(!(validAdminDetails(oldn,oldp))){         
+            JOptionPane.showMessageDialog(null, "Not valid Old Admin Name or Old password! \n\b Please check the Details again.");
+        }else if(newp.length() < 8||newp.equals(oldp)){
             JOptionPane.showMessageDialog(null, "Check the new Password again!");
-        }else if(oldn.equals(newn)){
-        JOptionPane.showMessageDialog(null, "Don't use old name.");}
+        }else if(checkAdminName(newn)){
+        JOptionPane.showMessageDialog(null, "Already registered with new name. \n please use different new name. ");}
         else if(nContact.length()!= 10){
         JOptionPane.showMessageDialog(null, "Check the new conatct number again");}
         else{
@@ -218,10 +217,14 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
     }//GEN-LAST:event_newnameActionPerformed
 
     private void back_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_back_bttnActionPerformed
-        // TODO add your handling code here:
-        AdminProfile admin = new AdminProfile();
-        admin.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            AdminProfile admin = new AdminProfile();
+            admin.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex);
+        }
     }//GEN-LAST:event_back_bttnActionPerformed
 
     private void clear_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_bttnActionPerformed
@@ -263,7 +266,11 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new UpdateAdminInfo().setVisible(true);
+                try {
+                    new UpdateAdminInfo().setVisible(true);
+                } catch (SQLException ex) {
+                   JOptionPane.showMessageDialog(null, ex);
+                }
             }
         });
     }
@@ -287,4 +294,43 @@ public class UpdateAdminInfo extends javax.swing.JFrame {
     private javax.swing.JTextField oldname;
     private javax.swing.JButton updateinfo_bttn;
     // End of variables declaration//GEN-END:variables
+private void Reconnect() throws SQLException{
+    if (this.conn == null || this.conn.isClosed()) {
+        try {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String db_password = null;
+            this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        }
+    }
+}
+private boolean checkAdminName(String name){
+    String sql = "SELECT  admin_Name FROM admin WHERE admin_Name=?";
+        try{
+            PreparedStatement add = conn.prepareStatement(sql);
+            add.setString(1, name);
+            ResultSet rst = add.executeQuery();
+            return rst.next();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs at checking AdminName : "+e);
+        }
+        return false;
+}
+private boolean validAdminDetails(String oldName, String passkey){
+    //can check if it is valid or not
+    String sql = "SELECT  admin_Name, admin_password FROM user WHERE admin_Name=? AND admin_password=?";
+        try{
+            PreparedStatement add = conn.prepareStatement(sql);
+            add.setString(1, oldName);
+            add.setString(2, passkey);
+            ResultSet rst = add.executeQuery();
+            return rst.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+}
 }

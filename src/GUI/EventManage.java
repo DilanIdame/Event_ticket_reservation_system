@@ -25,9 +25,10 @@ public class EventManage extends javax.swing.JFrame {
     /**
      * Creates new form EventManage
      */
-    public EventManage() {
+    public EventManage() throws SQLException {
         initComponents();
         conn= DbConnect.connect();
+        Reconnect();
         
     }
     
@@ -605,7 +606,19 @@ public class EventManage extends javax.swing.JFrame {
     private javax.swing.JTable updateTicket;
     private javax.swing.JTextField updateVenue;
     // End of variables declaration//GEN-END:variables
-
+private void Reconnect() throws SQLException{
+    if (this.conn == null || this.conn.isClosed()) {
+        try {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String db_password = null;
+            this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        }
+    }
+}
     // clear table method
     public static void removeAllRows(JTable table) {
 

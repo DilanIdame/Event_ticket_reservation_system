@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -198,9 +200,13 @@ public class LoginAdmin extends javax.swing.JFrame {
 
         }
         else if(checkAdminDetails(ad_name,ad_password)){
-            AdminProfile user = new AdminProfile();
-            user.setVisible(true);
-            this.dispose();
+            try {
+                AdminProfile user = new AdminProfile();
+                user.setVisible(true);
+                this.dispose();
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginAdmin.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }else{
             JOptionPane.showMessageDialog(this, "Wrong Administrator Name or Password");
         }

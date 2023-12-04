@@ -242,28 +242,32 @@ public class UserProfile extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void book_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_book_bttnActionPerformed
-        // TODO add your handling code here:
-        Reserve objBooking = new Reserve();
-        objBooking.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            Reserve objBooking = new Reserve();
+            objBooking.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            Logger.getLogger(UserProfile.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_book_bttnActionPerformed
 
     private void editProfile_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editProfile_bttnActionPerformed
-        try {
-            // TODO add your handling code here:
-            UpdateUserInfo user = new UpdateUserInfo(user_name);
-            user.setVisible(true);
-            this.dispose();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null,"Error occurs When edit profile button :"+ex);
-        }
+        // TODO add your handling code here:
+        UpdateUserInfo user = new UpdateUserInfo();
+        user.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_editProfile_bttnActionPerformed
 
     private void reservation_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reservation_bttnActionPerformed
-        // TODO add your handling code here:
-        UserReservation userRes = new UserReservation();
-        userRes.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            UserReservation userRes = new UserReservation();
+            userRes.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            Logger.getLogger(UserProfile.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_reservation_bttnActionPerformed
 
     private void logout_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logout_bttnActionPerformed
@@ -285,6 +289,7 @@ public class UserProfile extends javax.swing.JFrame {
             PreparedStatement add = conn.prepareStatement(sql_eventBox);
             ResultSet rs = add.executeQuery();
         
+        eventCombo.removeAllItems();
         while(rs.next()){
             selectByUser = rs.getString("event_name");
             eventCombo.addItem(selectByUser);
@@ -407,7 +412,7 @@ private void showUserTickets() throws SQLException {
         
         try {
             // TODO add your handling code here:
-            String sql_B = "SELECT seat_category, NoOf_seats,seat_price FROM seats JOIN event_table ON seats.event_ID = event_table.event_ID where event_name=?";
+            String sql_B = "SELECT s.seat_category, s.NoOf_seats, s.seat_price FROM seats s JOIN event_table e ON s.event_ID = e.event_ID where e.event_name=?";
             PreparedStatement add = conn.prepareStatement(sql_B);
             add.setString(1, selectByUser);
             ResultSet rs = add.executeQuery();

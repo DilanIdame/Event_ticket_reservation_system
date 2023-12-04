@@ -15,13 +15,13 @@ import javax.swing.table.DefaultTableModel;
 public class AdminProfile extends javax.swing.JFrame {
 
     Connection conn = null;
-    PreparedStatement pst =null;
-    ResultSet rs = null;
-    public String name;
-    public AdminProfile() {
+    public String selectItem;
+    
+    public AdminProfile() throws SQLException {
         
             initComponents();
             conn= DbConnect.connect();
+            Reconnect();
             
     }
 
@@ -128,7 +128,7 @@ public class AdminProfile extends javax.swing.JFrame {
                 {null, null, null}
             },
             new String [] {
-                "Category (Type)", "Available  seats", "Booked  seats"
+                "Category (Type)", "Seats", "Available  seats"
             }
         ) {
             Class[] types = new Class [] {
@@ -211,10 +211,10 @@ public class AdminProfile extends javax.swing.JFrame {
 
     private void statusbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusbtnActionPerformed
         try {
-            showEvent();
-            showTickets();
+            showEvent(selectItem);
+            showTickets(selectItem);
         } catch (SQLException ex) {
-           JOptionPane.showMessageDialog(null, ex);
+           JOptionPane.showMessageDialog(null, "Error occurs at see Status button : "+ex);
 
         }
         
@@ -223,46 +223,60 @@ public class AdminProfile extends javax.swing.JFrame {
     }//GEN-LAST:event_statusbtnActionPerformed
 
     private void edit_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit_bttnActionPerformed
-        // TODO add your handling code here:
-        UpdateAdminInfo admin = new UpdateAdminInfo();
-        admin.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            UpdateAdminInfo admin = new UpdateAdminInfo();
+            admin.setVisible(true);
+            this.dispose();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,e);
+        }
     }//GEN-LAST:event_edit_bttnActionPerformed
 
     private void admin_logout_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_admin_logout_bttnActionPerformed
-        // TODO add your handling code here:
-        Login admin_logout = new Login();
-        admin_logout.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            Login admin_logout = new Login();
+            admin_logout.setVisible(true);
+            this.dispose();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When logout :"+e);
+
+        }
     }//GEN-LAST:event_admin_logout_bttnActionPerformed
 
     private void add_event_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add_event_bttnActionPerformed
-        // TODO add your handling code here:
-        EventManage admin_event = new EventManage();
-        admin_event.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            EventManage admin_event = new EventManage();
+            admin_event.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null,"Error occurs When add_event :"+ex);
+        }
     }//GEN-LAST:event_add_event_bttnActionPerformed
 
     private void eventboxMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_eventboxMouseClicked
         // TODO add your handling code here:
         try{
-            if (this.conn == null || this.conn.isClosed()) {
-        // Re-establish the connection
-            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
-            String username = "root";
-            String password = "";
-            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
-            }
         String sql_eventBox = "SELECT event_name FROM event_table";
             PreparedStatement add = conn.prepareStatement(sql_eventBox);
-            rs = add.executeQuery();
+            ResultSet rs = add.executeQuery();
         
         while(rs.next()){
-            name = rs.getString("event_name");
+            String name = rs.getString("event_name");
             eventbox.addItem(name);
+            
         }
+        Object sObj = eventbox.getSelectedItem();
+        if (sObj != null){
+            if(sObj instanceof String ){
+               this.selectItem = (String)sObj;
+            }
+        }
+        
         }catch(SQLException e){
-            JOptionPane.showMessageDialog(null, e);
+            JOptionPane.showMessageDialog(null, "Error occurs at EventBox : "+e);
         
         }
         
@@ -297,8 +311,14 @@ public class AdminProfile extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new AdminProfile().setVisible(true);
+                try {
+                    new AdminProfile().setVisible(true);
+                } catch (SQLException e) {
+                      JOptionPane.showMessageDialog(null,"Error occurs at AdminProfile main :"+e);
+
+                }
             }
         });
     }
@@ -322,42 +342,60 @@ public class AdminProfile extends javax.swing.JFrame {
     private javax.swing.JButton statusbtn;
     private javax.swing.JTable ticketTable;
     // End of variables declaration//GEN-END:variables
-
-private void showEvent() throws SQLException {
+private void Reconnect() throws SQLException{
+    if (this.conn == null || this.conn.isClosed()) {
+        try {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String db_password = null;
+            this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        }
+    }
+}
+private void showEvent(String name ) throws SQLException {
         
         try {
             // TODO add your handling code here:
             String sql_A = "SELECT * FROM event_table where event_name=?";
             PreparedStatement add = conn.prepareStatement(sql_A);
             add.setString(1, name);
-            rs = add.executeQuery();
+            ResultSet rs = add.executeQuery();
             
+            DefaultTableModel tableModel = (DefaultTableModel)evenTable.getModel();
+            
+            while(rs.next()){
             String event = rs.getString("event_Name");
             String venue = rs.getString("venue");
             String time = rs.getString("date");
             String about = rs.getString("about");
-            DefaultTableModel tableModel = (DefaultTableModel)evenTable.getModel();
-            tableModel.addRow(new Object[]{event,venue, time, about});
+            
+            tableModel.addRow(new Object[]{event,venue, time, about});}
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex);
+            JOptionPane.showMessageDialog(null, "Error occurs at showing data in event table : "+ex);
         }
     }
-private void showTickets() throws SQLException {
-        
+private void showTickets(String name) throws SQLException {
         try {
             // TODO add your handling code here:
-            String sql_B = "SELECT seat_category, NoOf_seats,available_seats FROM seats where event_name=? JOIN event_table ON seats.event_ID = event_table.event_ID";
+            String sql_B = "SELECT s.seat_category, s.NoOf_seats, s.available_seats FROM seats s JOIN event_table e ON s.event_ID = e.event_ID WHERE e.event_name=?";
             PreparedStatement add = conn.prepareStatement(sql_B);
             add.setString(1, name);
-            rs = add.executeQuery();
+            ResultSet rs = add.executeQuery();
             
+            DefaultTableModel tblTicketModel = (DefaultTableModel)ticketTable.getModel();
+            while(rs.next()){
             String type = rs.getString("seat_category");
             int seats = rs.getInt("NoOf_seats");
             int available_seats = rs.getInt("available_setas");
-            DefaultTableModel tableModel = (DefaultTableModel)evenTable.getModel();
-            tableModel.addRow(new Object[]{type, seats, available_seats});
+            Object[] ticketDetails = {type,seats,available_seats};
+            
+            tblTicketModel.addRow(ticketDetails);}
+
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex);
+            JOptionPane.showMessageDialog(null, "error occurs at showing ticket details in table : "+ex);
         }
     }
 }

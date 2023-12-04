@@ -4,6 +4,10 @@
  */
 package GUI;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author User
@@ -13,8 +17,9 @@ public class Reserve extends javax.swing.JFrame {
     /**
      * Creates new form Reserve
      */
-    public Reserve() {
+    public Reserve() throws SQLException {
         initComponents();
+        Reconnect();
     }
 
     /**
@@ -372,4 +377,17 @@ public class Reserve extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField value;
     private javax.swing.JRadioButton visa;
     // End of variables declaration//GEN-END:variables
+private void Reconnect() throws SQLException{
+    if (this.conn == null || this.conn.isClosed()) {
+        try {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String db_password = null;
+            this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        }
+    }
+}
 }

@@ -26,9 +26,10 @@ public class UserReservation extends javax.swing.JFrame {
     /**
      * Creates new form UserReservation
      */
-    public UserReservation() {
+    public UserReservation() throws SQLException {
         initComponents();
         conn= DbConnect.connect();
+        Reconnect();
         try {
             showTable();
         } catch (SQLException ex) {
@@ -282,5 +283,17 @@ public class UserReservation extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null,e);
             }
     }
-
+private void Reconnect() throws SQLException{
+    if (this.conn == null || this.conn.isClosed()) {
+        try {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String db_password = null;
+            this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        }
+    }
+}
 }

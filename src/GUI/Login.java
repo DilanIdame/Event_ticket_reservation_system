@@ -195,7 +195,7 @@ public class Login extends javax.swing.JFrame {
         else if(checkUserDetails(user_name, user_password)){
              try {
                  //setName(user_name);
-                 UserProfile user = new UserProfile(user_name);
+                 UserProfile user = new UserProfile();
                  user.setVisible(true);
                  this.dispose();
              } catch (Exception e) {

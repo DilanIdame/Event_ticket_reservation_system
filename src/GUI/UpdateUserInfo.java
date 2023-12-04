@@ -8,27 +8,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.swing.table.DefaultTableModel;
 
 public class UpdateUserInfo extends javax.swing.JFrame {
 
     Connection conn = null;
     
-    String user_name;
-    
-    
-    public UpdateUserInfo(String user_name) throws SQLException {
-        initComponents();
-        conn= DbConnect.connect();
-        showDetails(user_name);
-        Reconnect();
-    }
 
     public UpdateUserInfo() {
         try {
             initComponents();
             conn= DbConnect.connect();
-            showDetails(user_name);
             Reconnect();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,"Error occurs at UpdateUserInfo constructor : "+e);
@@ -61,6 +50,8 @@ public class UpdateUserInfo extends javax.swing.JFrame {
         newPassword = new javax.swing.JPasswordField();
         oldPassword = new javax.swing.JPasswordField();
         newContact = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        oldName = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -77,7 +68,7 @@ public class UpdateUserInfo extends javax.swing.JFrame {
         jLabel1.setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(0, 102, 102)));
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 20, -1, -1));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 670, 90));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 90));
 
         jPanel3.setBackground(new java.awt.Color(0, 102, 102));
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, " Details Update ", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Calibri", 1, 18), new java.awt.Color(255, 255, 255))); // NOI18N
@@ -92,7 +83,7 @@ public class UpdateUserInfo extends javax.swing.JFrame {
                 backUser_bttnActionPerformed(evt);
             }
         });
-        jPanel3.add(backUser_bttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 260, 60, -1));
+        jPanel3.add(backUser_bttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 280, 60, -1));
 
         clearbttn.setBackground(new java.awt.Color(204, 204, 204));
         clearbttn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -103,7 +94,7 @@ public class UpdateUserInfo extends javax.swing.JFrame {
                 clearbttnActionPerformed(evt);
             }
         });
-        jPanel3.add(clearbttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 260, 60, -1));
+        jPanel3.add(clearbttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 280, 60, -1));
 
         updateinfobtn.setBackground(new java.awt.Color(204, 204, 204));
         updateinfobtn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -114,72 +105,79 @@ public class UpdateUserInfo extends javax.swing.JFrame {
                 updateinfobtnActionPerformed(evt);
             }
         });
-        jPanel3.add(updateinfobtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 260, 70, -1));
+        jPanel3.add(updateinfobtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 280, 70, -1));
 
         jLabel4.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("New Password :");
-        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 210, -1, 20));
+        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 240, -1, 20));
 
         jLabel5.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("New Contact : ");
-        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 130, -1, 20));
+        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 200, -1, 20));
 
         jLabel7.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("New Email :");
-        jPanel3.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 90, -1, 20));
+        jPanel3.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 160, -1, 20));
 
         jLabel2.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("New User Name :");
+        jLabel2.setText("Old User Name :");
         jLabel2.setToolTipText("");
-        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 50, 140, 20));
+        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 40, 140, 20));
 
         jLabel11.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(255, 255, 255));
         jLabel11.setText("Old Password :");
-        jPanel3.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 170, -1, 20));
+        jPanel3.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 80, -1, 20));
 
         newname.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newnameActionPerformed(evt);
             }
         });
-        jPanel3.add(newname, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 50, 300, -1));
+        jPanel3.add(newname, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 120, 300, -1));
 
         newEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newEmailActionPerformed(evt);
             }
         });
-        jPanel3.add(newEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 90, 300, -1));
+        jPanel3.add(newEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 160, 300, -1));
 
         newPassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newPasswordActionPerformed(evt);
             }
         });
-        jPanel3.add(newPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 210, 300, -1));
+        jPanel3.add(newPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 240, 300, -1));
 
         oldPassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 oldPasswordActionPerformed(evt);
             }
         });
-        jPanel3.add(oldPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 170, 300, -1));
+        jPanel3.add(oldPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 80, 300, -1));
 
         newContact.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newContactActionPerformed(evt);
             }
         });
-        jPanel3.add(newContact, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 300, -1));
+        jPanel3.add(newContact, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 200, 300, -1));
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 640, 310));
+        jLabel3.setFont(new java.awt.Font("Calibri", 1, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("New User Name :");
+        jLabel3.setToolTipText("");
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 120, 140, 20));
+        jPanel3.add(oldName, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 40, 300, -1));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 600));
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 640, 330));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 440));
 
         pack();
         setLocationRelativeTo(null);
@@ -188,31 +186,33 @@ public class UpdateUserInfo extends javax.swing.JFrame {
     private void updateinfobtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateinfobtnActionPerformed
         // TODO add your handling code here:
         
+        String oldn = oldName.getText();
         String newn = newname.getText();
         String oldp = String.valueOf(oldPassword.getPassword());
         String newp = String.valueOf(newPassword.getPassword());
         String nContact = newContact.getText();
         String nEmail = newEmail.getText();
         
-        if(oldp.isEmpty()|| newn.isEmpty()||newp.isEmpty()|| nContact.isEmpty()|| nEmail.isEmpty() ){
+        if(oldn.isEmpty()|| newn.isEmpty()||newp.isEmpty()|| nContact.isEmpty()|| nEmail.isEmpty() || oldp.isEmpty() ){
             JOptionPane.showMessageDialog(this, "Enter Details");}
-        else if(newp.length() < 8||newp.equals(oldp)){         
-        // TODO add your handling code here:
-            JOptionPane.showMessageDialog(null, "Check the new Password again!");
+        else if(!(validDetails(oldn,oldp))){         
+            JOptionPane.showMessageDialog(null, "Not valid Old User Name or Old password! \n\b Please check the Details again.");
         }else if(checkUserName(newn)){
-            JOptionPane.showMessageDialog(null, "Already Registered with this name. \n\bPlease Use different name");
+            JOptionPane.showMessageDialog(null, "Already Registered with this new name. \n\bPlease Use different new name");
+        }else if(newp.length() < 8||newp.equals(oldp)){         
+            JOptionPane.showMessageDialog(null, "Check the new Password again!");
         }
         else if(nContact.length()!= 10){
         JOptionPane.showMessageDialog(null, "Check the new conatct number again");}
         else{
             try{
-                String sql = "UPDATE user SET user_name = ?, user_password = ?, mobile_number = ?, email= ? WHERE user_name=? , user_password=?";
+                String sql = "UPDATE user SET user_name = ?, user_password = ?, mobile_number = ?, email= ? WHERE user_name=? AND user_password=?";
                 PreparedStatement add = conn.prepareStatement(sql);
                 add.setString(1,newn);
                 add.setString(2,newp);
                 add.setString(3,nContact);
                 add.setString(4,nEmail);
-                add.setString(5,user_name);
+                add.setString(5,oldn);
                 add.setString(6,oldp);
                 add.executeUpdate();
                 JOptionPane.showMessageDialog(null,"Update Sucessfully!");
@@ -245,16 +245,17 @@ public class UpdateUserInfo extends javax.swing.JFrame {
     private void backUser_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backUser_bttnActionPerformed
         try {
             // TODO add your handling code here:
-            UserProfile userNew = new UserProfile(user_name);
+            UserProfile userNew = new UserProfile();
             userNew.setVisible(true);
             this.dispose();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null,ex);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs at backUser button: "+e);
         }
     }//GEN-LAST:event_backUser_bttnActionPerformed
 
     private void clearbttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearbttnActionPerformed
         // TODO add your handling code here:
+        oldName.setText("");
         newname.setText("");
         newPassword.setText("");
         oldPassword.setText("");
@@ -308,6 +309,7 @@ public class UpdateUserInfo extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
@@ -318,6 +320,7 @@ public class UpdateUserInfo extends javax.swing.JFrame {
     private javax.swing.JTextField newEmail;
     private javax.swing.JPasswordField newPassword;
     private javax.swing.JTextField newname;
+    private javax.swing.JTextField oldName;
     private javax.swing.JPasswordField oldPassword;
     private javax.swing.JButton updateinfobtn;
     // End of variables declaration//GEN-END:variables
@@ -342,31 +345,45 @@ private boolean checkUserName(String name){
             ResultSet rst = add.executeQuery();
             return rst.next();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,"Error occurs at checking AdminName : "+e);
+            JOptionPane.showMessageDialog(null,"Error occurs at checking UserName : "+e);
         }
         return false;
 }
-private void showDetails(String name)throws SQLException {
-        try {
-            String sql = "SELECT * FROM user where user_name=? ";
+//private void showDetails(String name)throws SQLException {
+//        try {
+//            String sql = "SELECT * FROM user where user_name=? ";
+//            PreparedStatement add = conn.prepareStatement(sql);
+//            add.setString(1,name);
+//            ResultSet rs = add.executeQuery();
+//            while(rs.next()){
+//                String user_old_name = rs.getString("user_name");
+//                String user_Password = rs.getString("user_password");
+//                String user_contact = rs.getString("mobile_number");
+//                String user_Email = rs.getString("email");
+//                
+////                String tbDataNew[]= {user_old_name,user_Email ,user_contact,user_Password};
+////                DefaultTableModel tblModel = (DefaultTableModel)details_table.getModel();
+////               
+////                tblModel.addRow(tbDataNew);
+//            }
+//             }
+//        catch (SQLException e) {
+//            JOptionPane.showMessageDialog(null,"Error occurs at showing current details"+e);
+//            }
+//    }
+private boolean validDetails(String oldName, String passkey){
+    //can check if it is valid or not
+    String sql = "SELECT  user_name,user_password FROM user WHERE user_name=? AND user_password=?";
+        try{
             PreparedStatement add = conn.prepareStatement(sql);
-            add.setString(1,name);
-            ResultSet rs = add.executeQuery();
-            while(rs.next()){
-                String user_old_name = rs.getString("user_name");
-                String user_Password = rs.getString("user_password");
-                String user_contact = rs.getString("mobile_number");
-                String user_Email = rs.getString("email");
-                
-                String tbDataNew[]= {user_old_name,user_Email ,user_contact,user_Password};
-                DefaultTableModel tblModel = (DefaultTableModel)details_table.getModel();
-               
-                tblModel.addRow(tbDataNew);
-            }
-             }
-        catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,"Error occurs at showing current details"+e);
-            }
-    }
+            add.setString(1, oldName);
+            add.setString(2, passkey);
+            ResultSet rst = add.executeQuery();
+            return rst.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+}
 }
 
