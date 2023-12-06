@@ -4,8 +4,12 @@
  */
 package GUI;
 
+import CODE.DbConnect;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -13,13 +17,15 @@ import javax.swing.JOptionPane;
  * @author User
  */
 public class Reserve extends javax.swing.JFrame {
-
+    Connection conn = null;
     /**
      * Creates new form Reserve
      */
     public Reserve() throws SQLException {
         initComponents();
+        conn= DbConnect.connect();
         Reconnect();
+       
     }
 
     /**
@@ -308,10 +314,14 @@ public class Reserve extends javax.swing.JFrame {
     }//GEN-LAST:event_paybtnActionPerformed
 
     private void Back_userActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Back_userActionPerformed
-        // TODO add your handling code here:
-        UserProfile userRes = new UserProfile();
-        userRes.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            UserProfile userRes = new UserProfile();
+            userRes.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            Logger.getLogger(Reserve.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_Back_userActionPerformed
 
     /**
@@ -343,8 +353,13 @@ public class Reserve extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new Reserve().setVisible(true);
+                try {
+                    new Reserve().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(Reserve.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }

@@ -4,17 +4,33 @@
  */
 package GUI;
 
+import CODE.DbConnect;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author User
  */
 public class AddTickets extends javax.swing.JFrame {
 
-    /**
-     * Creates new form AddTickets
-     */
-    public AddTickets(String name) {
+    Connection conn = null;
+    public String admin_name;
+    public AddTickets(String name) throws SQLException {
         initComponents();
+            conn= DbConnect.connect();
+            Reconnect();
+    }
+    public AddTickets() throws SQLException {
+        initComponents();
+            conn= DbConnect.connect();
+            Reconnect();
     }
 
     /**
@@ -137,47 +153,44 @@ public class AddTickets extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addTicketsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTicketsActionPerformed
-        // TODO add your handling code here:
-        String evName = new_event.getText();
-        String evVenue = new_venue.getText();
-        String evDate = new_date.getText();
-        String evAbout = new_about.getText();
-        String adName = getAdminName();
-        //table.getTable();
-
-        try {
-            String sql = "INSERT INTO event_table(event_Name, venue, date, about) VALUES (?, ?, ?, ?) WHERE admin_name";
-            PreparedStatement add = conn.prepareStatement(sql);
-
-            // Set values using prepared statement parameters
-            add.setString(1, evName);
-            add.setString(2, evVenue);
-            add.setString(3, evDate);
-            add.setString(4, evAbout);
-            add.setString(5,adName);
-
-            // Execute the update
-            int rowsAffected = add.executeUpdate();
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(null, "Event Added!");
-                new_event.setText("");
-                new_venue.setText("");
-                new_date.setText("");
-                new_about.setText("");
-                removeAllRows(new_ticket_details);
-            } else {
-                JOptionPane.showMessageDialog(null, " Failed!\n Try Again!");}
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error occurs at Adding event : "+e);
-        }
+//        // TODO add your handling code here:
+//        String evName = new_event.getText();
+//        String evVenue = new_venue.getText();
+//        String evDate = new_date.getText();
+//        String evAbout = new_about.getText();
+//        String adName = getAdminName();
+//        //table.getTable();
+//
+//        try {
+//            String sql = "INSERT INTO event_table(event_Name, venue, date, about) VALUES (?, ?, ?, ?) WHERE admin_name";
+//            PreparedStatement add = conn.prepareStatement(sql);
+//
+//            // Set values using prepared statement parameters
+//            add.setString(1, evName);
+//            add.setString(2, evVenue);
+//            add.setString(3, evDate);
+//            add.setString(4, evAbout);
+//            add.setString(5,adName);
+//
+//            // Execute the update
+//            int rowsAffected = add.executeUpdate();
+//            if (rowsAffected > 0) {
+//                JOptionPane.showMessageDialog(null, "Event Added!");
+//                new_event.setText("");
+//                new_venue.setText("");
+//                new_date.setText("");
+//                new_about.setText("");
+//                removeAllRows(new_ticket_details);
+//            } else {
+//                JOptionPane.showMessageDialog(null, " Failed!\n Try Again!");}
+//        } catch (SQLException e) {
+//            JOptionPane.showMessageDialog(null, "Error occurs at Adding event : "+e);
+//        }
     }//GEN-LAST:event_addTicketsActionPerformed
 
     private void clear_bttn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_bttn1ActionPerformed
         // TODO add your handling code here:
-        new_event.setText("");
-        new_venue.setText("");
-        new_date.setText("");
-        new_about.setText("");
+        removeAllRows(new_ticket_details);
 
     }//GEN-LAST:event_clear_bttn1ActionPerformed
 
@@ -221,8 +234,13 @@ public class AddTickets extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new AddTickets().setVisible(true);
+                try {
+                    new AddTickets().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -239,4 +257,26 @@ public class AddTickets extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable new_ticket_details;
     // End of variables declaration//GEN-END:variables
+
+public static void removeAllRows(JTable table) {
+
+    DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+    for (int row = 0; row < table.getRowCount(); row++) {
+        model.removeRow(row);
+    }
+}
+private void Reconnect() throws SQLException{
+    if (this.conn == null || this.conn.isClosed()) {
+        try {
+            // Re-establish the connection
+            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
+            String username = "root";
+            String db_password = null;
+            this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        }
+    }
+}
 }

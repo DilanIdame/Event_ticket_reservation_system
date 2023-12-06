@@ -464,10 +464,14 @@ public class EventManage extends javax.swing.JFrame {
     }//GEN-LAST:event_delete_eventActionPerformed
     }
     private void goToTicketsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goToTicketsActionPerformed
-        // TODO add your handling code here:
-        AddTickets adminNew = new AddTickets(name);
-        adminNew.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            AddTickets adminNew = new AddTickets(name);
+            adminNew.setVisible(true);
+            this.dispose();
+        } catch (SQLException ex) {
+            Logger.getLogger(EventManage.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_goToTicketsActionPerformed
 
     private void select_eventMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_select_eventMouseClicked
@@ -600,9 +604,7 @@ private void Reconnect() throws SQLException{
 //}
   void setAdminName(){
      String admin_name = adminName.getText();
-     try{if(admin_name.equals("")){
-         JOptionPane.showMessageDialog(null, "Please Fill Admin Name!");
-     }else if(checkAdminName(admin_name)){
+     try{if(checkAdminName(admin_name)){
          this.name =admin_name;
      }else{
          JOptionPane.showMessageDialog(null, "Check the Your Name again");
