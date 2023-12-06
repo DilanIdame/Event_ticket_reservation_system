@@ -9,11 +9,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
 import CODE.DbConnect;
-import java.awt.HeadlessException;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,7 +24,8 @@ import javax.swing.table.DefaultTableModel;
  */
 public class EventManage extends javax.swing.JFrame {
     Connection conn = null;
-    public int user_ID =0;
+    public String name;
+    public String selectthisEvent;
     /**
      * Creates new form EventManage
      */
@@ -35,29 +39,29 @@ public class EventManage extends javax.swing.JFrame {
     public String categoryN;
     public int seatPrice,seatNo ;
     
-    public void getTable(){
-        DefaultTableModel tblModel1 = (DefaultTableModel) new_ticket_details.getModel();
-        if (tblModel1.getRowCount() == 0){
-            JOptionPane.showMessageDialog(this,"table is empty");
-        }
-        else{
-            for(int i=0; i<tblModel1.getRowCount();i++){
-                try {
-                    categoryN = tblModel1.getValueAt(i, 0).toString();
-                    seatNo =  (int) tblModel1.getValueAt(i, 1);
-                    seatPrice =  (int) tblModel1.getValueAt(i, 2);
-                    String sql_add = "insert into seats(seat_category,NoOf_seats,seat_price ) values (?,?,?)";
-                    PreparedStatement pst =conn.prepareStatement(sql_add);
-                    pst.setString(1,categoryN);
-                    pst.setInt(2,seatNo);
-                    pst.setInt(2,seatPrice);
-                    pst.execute();
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(this,ex);
-                }
-            }
-        }
-    }
+//    public void getTable(){
+//        DefaultTableModel tblModel1 = (DefaultTableModel) new_ticket_details.getModel();
+//        if (tblModel1.getRowCount() == 0){
+//            JOptionPane.showMessageDialog(this,"table is empty");
+//        }
+//        else{
+//            for(int i=0; i<tblModel1.getRowCount();i++){
+//                try {
+//                    categoryN = tblModel1.getValueAt(i, 0).toString();
+//                    seatNo =  (int) tblModel1.getValueAt(i, 1);
+//                    seatPrice =  (int) tblModel1.getValueAt(i, 2);
+//                    String sql_add = "insert into seats(seat_category,NoOf_seats,seat_price ) values (?,?,?)";
+//                    PreparedStatement pst =conn.prepareStatement(sql_add);
+//                    pst.setString(1,categoryN);
+//                    pst.setInt(2,seatNo);
+//                    pst.setInt(2,seatPrice);
+//                    pst.execute();
+//                } catch (SQLException ex) {
+//                    JOptionPane.showMessageDialog(this,ex);
+//                }
+//            }
+//        }
+//    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -79,15 +83,14 @@ public class EventManage extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         new_about = new javax.swing.JTextArea();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        new_ticket_details = new javax.swing.JTable();
-        jLabel9 = new javax.swing.JLabel();
         addEvent = new javax.swing.JButton();
         clear_bttn1 = new javax.swing.JButton();
         back = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        goToTickets = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
@@ -98,13 +101,12 @@ public class EventManage extends javax.swing.JFrame {
         updateDate = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         updateAbout = new javax.swing.JTextArea();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        updateTicket = new javax.swing.JTable();
         Update_bttn = new javax.swing.JButton();
         clear_bttn2 = new javax.swing.JButton();
         delete_event = new javax.swing.JButton();
+        selectEvent = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        admin_name = new javax.swing.JTextField();
+        adminName = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -131,17 +133,17 @@ public class EventManage extends javax.swing.JFrame {
                 new_eventActionPerformed(evt);
             }
         });
-        jPanel3.add(new_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 40, 460, -1));
+        jPanel3.add(new_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 40, 740, -1));
 
         jLabel3.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("About :");
-        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, 70, 30));
+        jLabel3.setText("Add your Event Ticket Details  :");
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 280, 280, 30));
 
         jLabel4.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Event :");
-        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 70, 30));
+        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 70, 30));
 
         new_venue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -149,50 +151,22 @@ public class EventManage extends javax.swing.JFrame {
             }
         });
         jPanel3.add(new_venue, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 80, 230, -1));
-        jPanel3.add(new_date, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 80, 340, -1));
+        jPanel3.add(new_date, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 80, 280, -1));
 
-        jLabel8.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Calisto MT", 1, 15)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel8.setText("Date :");
-        jPanel3.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 80, 70, 30));
+        jLabel8.setText("(yyyy-mm-dd) : ");
+        jPanel3.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 80, 110, 30));
 
         new_about.setColumns(20);
         new_about.setRows(5);
         jScrollPane1.setViewportView(new_about);
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 120, 230, 50));
-
-        new_ticket_details.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
-            },
-            new String [] {
-                "Category (Type)", "No. of seats", "Ticket price"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        jScrollPane2.setViewportView(new_ticket_details);
-
-        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 130, 350, 80));
-
-        jLabel9.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("Ticket Details :");
-        jPanel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 120, 130, 30));
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 120, 480, 90));
 
         addEvent.setBackground(new java.awt.Color(204, 204, 204));
         addEvent.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
-        addEvent.setText("Add ");
+        addEvent.setText("Add");
         addEvent.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         addEvent.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         addEvent.addActionListener(new java.awt.event.ActionListener() {
@@ -200,7 +174,7 @@ public class EventManage extends javax.swing.JFrame {
                 addEventActionPerformed(evt);
             }
         });
-        jPanel3.add(addEvent, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 220, 70, 30));
+        jPanel3.add(addEvent, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 230, 90, 30));
 
         clear_bttn1.setBackground(new java.awt.Color(204, 204, 204));
         clear_bttn1.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -212,7 +186,7 @@ public class EventManage extends javax.swing.JFrame {
                 clear_bttn1ActionPerformed(evt);
             }
         });
-        jPanel3.add(clear_bttn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 220, 60, 30));
+        jPanel3.add(clear_bttn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 230, 70, 30));
 
         back.setBackground(new java.awt.Color(204, 204, 204));
         back.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -224,23 +198,40 @@ public class EventManage extends javax.swing.JFrame {
                 backActionPerformed(evt);
             }
         });
-        jPanel3.add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 220, 70, 30));
+        jPanel3.add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 230, 80, 30));
 
         jLabel7.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Venue :");
-        jPanel3.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 80, 70, 30));
+        jPanel3.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 70, 30));
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 890, 270));
+        jLabel14.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel14.setText("About :");
+        jPanel3.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 120, 70, 30));
+
+        goToTickets.setBackground(new java.awt.Color(204, 204, 204));
+        goToTickets.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        goToTickets.setText("Add Tickets");
+        goToTickets.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        goToTickets.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        goToTickets.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                goToTicketsActionPerformed(evt);
+            }
+        });
+        jPanel3.add(goToTickets, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 280, 90, 30));
+
+        jLabel9.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel9.setText("Date");
+        jPanel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 80, 50, 30));
+
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 900, 340));
 
         jPanel4.setBackground(new java.awt.Color(0, 102, 102));
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, " Update Event ", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Calisto MT", 1, 18), new java.awt.Color(255, 255, 255))); // NOI18N
         jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel6.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel6.setText("Ticket Details  :");
-        jPanel4.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 170, 140, 30));
 
         jLabel10.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
@@ -256,13 +247,19 @@ public class EventManage extends javax.swing.JFrame {
         jLabel12.setForeground(new java.awt.Color(255, 255, 255));
         jLabel12.setText("Existing Event :");
         jPanel4.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 140, 30));
-        jPanel4.add(select_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 20, 470, 40));
+
+        select_event.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                select_eventMouseClicked(evt);
+            }
+        });
+        jPanel4.add(select_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 20, 540, 40));
         jPanel4.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 110, 900, 10));
 
         jLabel13.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
         jLabel13.setForeground(new java.awt.Color(255, 255, 255));
         jLabel13.setText("About :");
-        jPanel4.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, 70, 30));
+        jPanel4.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 170, 70, 30));
 
         updateVenue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -276,37 +273,19 @@ public class EventManage extends javax.swing.JFrame {
         updateAbout.setRows(5);
         jScrollPane3.setViewportView(updateAbout);
 
-        jPanel4.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 170, 230, -1));
-
-        updateTicket.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
-            },
-            new String [] {
-                "Category (type)", "No. of seats", "Ticket price"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        jScrollPane4.setViewportView(updateTicket);
-
-        jPanel4.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 170, 340, 90));
+        jPanel4.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 170, 450, -1));
 
         Update_bttn.setBackground(new java.awt.Color(204, 204, 204));
         Update_bttn.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
         Update_bttn.setText("Update");
         Update_bttn.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         Update_bttn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel4.add(Update_bttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 280, 70, 30));
+        Update_bttn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Update_bttnActionPerformed(evt);
+            }
+        });
+        jPanel4.add(Update_bttn, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 280, 110, 30));
 
         clear_bttn2.setBackground(new java.awt.Color(204, 204, 204));
         clear_bttn2.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
@@ -318,28 +297,40 @@ public class EventManage extends javax.swing.JFrame {
                 clear_bttn2ActionPerformed(evt);
             }
         });
-        jPanel4.add(clear_bttn2, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 280, 70, 30));
+        jPanel4.add(clear_bttn2, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 280, 90, 30));
 
         delete_event.setBackground(new java.awt.Color(204, 204, 204));
         delete_event.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
-        delete_event.setText("Delete Event");
+        delete_event.setText("Remove Event");
         delete_event.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         delete_event.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 delete_eventActionPerformed(evt);
             }
         });
-        jPanel4.add(delete_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 70, 90, 30));
+        jPanel4.add(delete_event, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 70, 130, 30));
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 440, 890, 330));
+        selectEvent.setBackground(new java.awt.Color(204, 204, 204));
+        selectEvent.setFont(new java.awt.Font("Calibri", 1, 14)); // NOI18N
+        selectEvent.setText("Select Event to Update");
+        selectEvent.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        selectEvent.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        selectEvent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectEventActionPerformed(evt);
+            }
+        });
+        jPanel4.add(selectEvent, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 70, 150, 30));
+
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 510, -1, 330));
 
         jLabel5.setFont(new java.awt.Font("Calisto MT", 1, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Admin name :");
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 120, 30));
-        jPanel1.add(admin_name, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 110, 700, -1));
+        jPanel1.add(adminName, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 110, 700, -1));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 920, 790));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 920, 850));
 
         pack();
         setLocationRelativeTo(null);
@@ -354,69 +345,71 @@ public class EventManage extends javax.swing.JFrame {
     }//GEN-LAST:event_new_venueActionPerformed
 
     private void addEventActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addEventActionPerformed
-        // TODO add your handling code here:
-        String evName = new_event.getText();
-        String evVenue = new_venue.getText();
-        String evDate = new_date.getText();
-        String evAbout = new_about.getText();
-        //table.getTable();
-
-        try {
-        String sql = "INSERT INTO event_table(event_Name, venue, date, about) VALUES (?, ?, ?, ?)";
-        PreparedStatement add = conn.prepareStatement(sql);
-
-        // Set values using prepared statement parameters
-        add.setString(1, evName);
-        add.setString(2, evVenue);
-        add.setString(3, evDate);
-        add.setString(4, evAbout);
-
-        // Execute the update
-        int rowsAffected = add.executeUpdate();
+        if(new_event.equals("") || new_venue.equals("") || new_date.equals("") || new_about.equals("")){
+           JOptionPane.showMessageDialog(null, "Please fill the details.");
+        }else{
+        try {                                         
+            // TODO add your handling code here:
+            String evName = new_event.getText();
+            String evVenue = new_venue.getText();
+            String evAbout = new_about.getText();
+            int adminID = getAdminIdFromDatabase(name);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date parsedDate = dateFormat.parse(updateDate.getText());
+            java.sql.Date sqlDate = new java.sql.Date(parsedDate.getTime());
+            //table.getTable();
+            
+            try {
+                String sql = "INSERT INTO event_table(event_Name, venue, date, about, admin_ID) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement add = conn.prepareStatement(sql);
+                
+                // Set values using prepared statement parameters
+                add.setString(1, evName);
+                add.setString(2, evVenue);
+                add.setDate(3, sqlDate);
+                add.setString(4, evAbout);
+                add.setInt(5,adminID);
+                
+                // Execute the update
+                int rowsAffected = add.executeUpdate();
                 if (rowsAffected > 0) {
                     JOptionPane.showMessageDialog(null, "Event Added!");
                     new_event.setText("");
                     new_venue.setText("");
                     new_date.setText("");
                     new_about.setText("");
-                    removeAllRows(new_ticket_details);
+//                    removeAllRows(new_ticket_details);
                 } else {
-                    JOptionPane.showMessageDialog(null, " Failed!\n Try Again!");}
-        } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error occurs at Adding event : "+e);
-        } finally {
-        // Close the PreparedStatement in a finally block
-        try {
-            if (pst != null) {
-                pst.close();
+                    JOptionPane.showMessageDialog(null, " Failed! \nTry Again!");}
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Error occurs at Adding event : "+e);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-        Login admin = new Login();
-        admin.setVisible(true);
-        this.dispose();
-        
+        } catch (ParseException ex) {
+            Logger.getLogger(EventManage.class.getName()).log(Level.SEVERE,null, ex);
+        }         
     }//GEN-LAST:event_addEventActionPerformed
-
+}
     private void updateVenueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateVenueActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_updateVenueActionPerformed
 
     private void clear_bttn2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_bttn2ActionPerformed
         // TODO add your handling code here:
-        removeAllRows(updateTicket);
+//        removeAllRows(updateTicket);
         updateVenue.setText("");
         updateDate.setText("");
         updateAbout.setText(""); 
     }//GEN-LAST:event_clear_bttn2ActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-        // TODO add your handling code here:
-        AdminProfile adminNew = new AdminProfile();
-        adminNew.setVisible(true);
-        this.dispose();
+        try {
+            // TODO add your handling code here:
+            AdminProfile adminNew = new AdminProfile();
+            adminNew.setVisible(true);
+            this.dispose();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, " Error occurs at Adding event : "+e);
+        }
     }//GEN-LAST:event_backActionPerformed
 
     private void clear_bttn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clear_bttn1ActionPerformed
@@ -425,124 +418,89 @@ public class EventManage extends javax.swing.JFrame {
         new_venue.setText("");
         new_date.setText("");
         new_about.setText("");
-        removeAllRows(new_ticket_details);
+        
     }//GEN-LAST:event_clear_bttn1ActionPerformed
 
     private void select_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_select_bttnActionPerformed
-        // TODO add your handling code here:
-        try {
-        String event = String.valueOf(select_event.getSelectedItem());
-        DefaultTableModel model = (DefaultTableModel) updateTicket.getModel();
 
-        // Clear existing rows in the table
-        model.setRowCount(0);
-
-        if (this.conn == null || this.conn.isClosed()) {
-            // Re-establish the connection
-            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
-            String username = "root";
-            String password = "";
-            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
-        }
-
-        String sql = "SELECT eventName, venue, date, about FROM event_table WHERE eventName = ?";
-        pst = conn.prepareStatement(sql);
-        pst.setString(1, event);
-        ResultSet resultSet = pst.executeQuery();
-
-        while (resultSet.next()) {
-            Object[] row = new Object[4];
-            row[0] = resultSet.getString("eventName");
-            row[1] = resultSet.getString("venue");
-            row[2] = resultSet.getString("date");
-            row[3] = resultSet.getString("about");
-            model.addRow(row);
-        }
-
-        // Move the message outside of the loop
-        JOptionPane.showMessageDialog(null, "Data retrieved successfully!");
-        } catch 
-            (Exception e) {
-        JOptionPane.showMessageDialog(null, e);
-        } finally {
-        // Close resources if needed
-        try {
-            if (pst != null) {
-                pst.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-        Login admin = new Login();
-        admin.setVisible(true);
-        this.dispose();
         
     }//GEN-LAST:event_select_bttnActionPerformed
 
     private void Update_bttnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Update_bttnActionPerformed
-        // TODO add your handling code here:
-        try {
-        if (this.conn == null || this.conn.isClosed()) {
-            // Re-establish the connection
-            String jdbcUrl = "jdbc:mysql://localhost:3306/event_reservation";
-            String username = "root";
-            String password = "";
-            this.conn = DriverManager.getConnection(jdbcUrl, username, password);
-        }
-
-        DefaultTableModel model = (DefaultTableModel) updateTicket.getModel();
-
+        String venue = updateVenue.getText();
+        Object date = updateDate.getText();
+        String about = updateAbout.getText();
+        
+        try{
         String updateSql = "UPDATE event_table SET venue=?, date=?, about=? WHERE eventName=?";
-        pst = conn.prepareStatement(updateSql);
+        PreparedStatement add = conn.prepareStatement(updateSql);
 
-        int rowCount = model.getRowCount();
-
-        for (int i = 0; i < rowCount; i++) {
-            String eventName = (String) model.getValueAt(i, 0);
-            String venue = (String) model.getValueAt(i, 1);
-            String date = (String) model.getValueAt(i, 2);
-            String about = (String) model.getValueAt(i, 3);
-
-            pst.setString(1, venue);
-            pst.setString(2, date);
-            pst.setString(3, about);
-            pst.setString(4, eventName);
+            add.setString(1, venue);
+            add.setObject(2, date);
+            add.setString(3, about);
+            
 
             // Execute the update
-            pst.executeUpdate();
-        }
+            add.executeUpdate();
+        
 
         JOptionPane.showMessageDialog(null, "Database updated successfully!");
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, e);
-    } finally {
-        // Close resources if needed
-        try {
-            if (pst != null) {
-                pst.close();
-            }
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+        JOptionPane.showMessageDialog(null, e);
+    
+        } 
     }//GEN-LAST:event_Update_bttnActionPerformed
 
     private void delete_eventActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delete_eventActionPerformed
         // TODO add your handling code here:
-        JOptionPane.showMessageDialog(null, "Do you want to delete the event?");
-        try{String sql2 = "DELETE FROM  booking  where user_ID = ?";
+        try{String sql2 = "DELETE FROM  event_table  where  event_name= ?";
         PreparedStatement add = conn.prepareStatement(sql2);
-        add.setInt(1, userID);
+        
         add.executeQuery();
         JOptionPane.showMessageDialog(null, "Event successfully delete!");
         }
         catch(SQLException e){
             JOptionPane.showMessageDialog(null, e);
     }//GEN-LAST:event_delete_eventActionPerformed
+    }
+    private void goToTicketsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goToTicketsActionPerformed
+        // TODO add your handling code here:
+        AddTickets adminNew = new AddTickets(name);
+        adminNew.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_goToTicketsActionPerformed
+
+    private void select_eventMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_select_eventMouseClicked
+        // TODO add your handling code here
+        try{
+        String sql_eventBox = "SELECT event_name FROM event_table";
+            PreparedStatement add = conn.prepareStatement(sql_eventBox);
+            ResultSet rs = add.executeQuery();
+        
+        while(rs.next()){
+            String name = rs.getString("event_name");
+            select_event.addItem(name);
+            
+        }
+        Object sObj = select_event.getSelectedItem();
+        if (sObj != null){
+            if(sObj instanceof String ){
+               this.selectthisEvent = (String)sObj;
+            }
+        }
+        
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null, "Error occurs at selecting event box : "+e);
+        
+        }
+    }//GEN-LAST:event_select_eventMouseClicked
+
+    private void selectEventActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectEventActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_selectEventActionPerformed
 
     
-    }public static void main(String args[]) {
+    public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -568,9 +526,14 @@ public class EventManage extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new EventManage().setVisible(true);
-                EventManage table = new EventManage();
+                try {
+                    new EventManage().setVisible(true);
+//                EventManage table = new EventManage();
+                } catch (SQLException ex) {
+                    Logger.getLogger(EventManage.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -578,20 +541,21 @@ public class EventManage extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Update_bttn;
     private javax.swing.JButton addEvent;
-    private javax.swing.JTextField admin_name;
+    private javax.swing.JTextField adminName;
     private javax.swing.JButton back;
     private javax.swing.JButton clear_bttn1;
     private javax.swing.JButton clear_bttn2;
     private javax.swing.JButton delete_event;
+    private javax.swing.JButton goToTickets;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -600,19 +564,16 @@ public class EventManage extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextArea new_about;
     private javax.swing.JTextField new_date;
     private javax.swing.JTextField new_event;
-    private javax.swing.JTable new_ticket_details;
     private javax.swing.JTextField new_venue;
+    private javax.swing.JButton selectEvent;
     private java.awt.Choice select_event;
     private javax.swing.JTextArea updateAbout;
     private javax.swing.JTextField updateDate;
-    private javax.swing.JTable updateTicket;
     private javax.swing.JTextField updateVenue;
     // End of variables declaration//GEN-END:variables
 private void Reconnect() throws SQLException{
@@ -629,12 +590,63 @@ private void Reconnect() throws SQLException{
     }
 }
     // clear table method
-    public static void removeAllRows(JTable table) {
-
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-
-        for (int row = 0; row < table.getRowCount(); row++) {
-            model.removeRow(row);
+//public static void removeAllRows(JTable table) {
+//
+//    DefaultTableModel model = (DefaultTableModel) table.getModel();
+//
+//    for (int row = 0; row < table.getRowCount(); row++) {
+//        model.removeRow(row);
+//    }
+//}
+  void setAdminName(){
+     String admin_name = adminName.getText();
+     try{if(admin_name.equals("")){
+         JOptionPane.showMessageDialog(null, "Please Fill Admin Name!");
+     }else if(checkAdminName(admin_name)){
+         this.name =admin_name;
+     }else{
+         JOptionPane.showMessageDialog(null, "Check the Your Name again");
+     }
+     }catch(Exception e){
+         JOptionPane.showMessageDialog(null, "error with set admin naming.");
+     }
+ }
+ 
+ public String getAdminName(){
+     return name;
+ }
+ 
+ private boolean checkAdminName(String this_name){
+     String sql = "SELECT  admin_Name FROM admin WHERE admin_Name=?";
+        try{
+            PreparedStatement add = conn.prepareStatement(sql);
+            add.setString(1, this_name);
+            ResultSet rst = add.executeQuery();
+            return rst.next();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Error occurs at checking AdminName : "+e);
         }
+        return false;
+ }
+  private int getAdminIdFromDatabase(String adminName) {
+        int adminId = -1; // Default value indicating an error or not found
+
+        String selectSql = "SELECT admin_ID FROM admin WHERE admin_Name = ?";
+        
+        try{
+            PreparedStatement add = conn.prepareStatement(selectSql);
+            add.setString(1, adminName);
+
+            try (ResultSet resultSet = add.executeQuery()) {
+                if (resultSet.next()) {
+                    adminId = resultSet.getInt("admin_Id");
+                }
+            }
+        } catch (SQLException e) {
+            // Handle the exception according to your needs
+            JOptionPane.showMessageDialog(null,"Error occurs at getting admin id : "+e);
+        }
+
+        return adminId;
     }
 }
