@@ -239,7 +239,7 @@ public class AddTickets extends javax.swing.JFrame {
                 try {
                     new AddTickets().setVisible(true);
                 } catch (SQLException ex) {
-                    Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(null, "Error occurs at Adding event : "+ex);
                 }
             }
         });
