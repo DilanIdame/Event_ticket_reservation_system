@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 
 public class AdminProfile extends javax.swing.JFrame {
@@ -214,7 +216,7 @@ public class AdminProfile extends javax.swing.JFrame {
             showEvent(selectItem);
             showTickets(selectItem);
         } catch (SQLException ex) {
-           JOptionPane.showMessageDialog(null, "Error occurs at see Status button : "+ex);
+           Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, ex);
 
         }
         
@@ -229,7 +231,7 @@ public class AdminProfile extends javax.swing.JFrame {
             admin.setVisible(true);
             this.dispose();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,e);
+            Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, e);
         }
     }//GEN-LAST:event_edit_bttnActionPerformed
 
@@ -240,7 +242,7 @@ public class AdminProfile extends javax.swing.JFrame {
             admin_logout.setVisible(true);
             this.dispose();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,"Error occurs When logout :"+e);
+            Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, e);
 
         }
     }//GEN-LAST:event_admin_logout_bttnActionPerformed
@@ -252,7 +254,7 @@ public class AdminProfile extends javax.swing.JFrame {
             admin_event.setVisible(true);
             this.dispose();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null,"Error occurs When add_event :"+ex);
+            Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_add_event_bttnActionPerformed
 
@@ -276,7 +278,7 @@ public class AdminProfile extends javax.swing.JFrame {
         }
         
         }catch(SQLException e){
-            JOptionPane.showMessageDialog(null, "Error occurs at EventBox : "+e);
+            Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, e);
         
         }
         
@@ -315,8 +317,8 @@ public class AdminProfile extends javax.swing.JFrame {
             public void run() {
                 try {
                     new AdminProfile().setVisible(true);
-                } catch (SQLException e) {
-                      JOptionPane.showMessageDialog(null,"Error occurs at AdminProfile main :"+e);
+                } catch (SQLException ex) {
+                      Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, ex);
 
                 }
             }
@@ -350,8 +352,8 @@ private void Reconnect() throws SQLException{
             String username = "root";
             String db_password = null;
             this.conn = DriverManager.getConnection(jdbcUrl, username, db_password);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,"Error occurs When reconnecting Database :"+e);
+        } catch (SQLException ex) {
+            Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
@@ -374,7 +376,7 @@ private void showEvent(String name ) throws SQLException {
             
             tableModel.addRow(new Object[]{event,venue, time, about});}
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error occurs at showing data in event table : "+ex);
+            Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 private void showTickets(String name) throws SQLException {
@@ -395,7 +397,7 @@ private void showTickets(String name) throws SQLException {
             tblTicketModel.addRow(ticketDetails);}
 
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "error occurs at showing ticket details in table : "+ex);
+            Logger.getLogger(AddTickets.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
